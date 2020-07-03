@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      target: API
+    ports:
+      - "3033:3033"
+      - "3034:3034"
+  synchronizer:
+    build:
+      context: .
+      target: Synchronizer

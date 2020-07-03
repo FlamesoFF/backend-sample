@@ -1,0 +1,9 @@
+{
+    "check-leaks": true,
+    "extension": [
+        "ts"
+    ],
+    "reporter": "spec",
+    "timeout": 2000,
+    "ui": "bdd"
+}

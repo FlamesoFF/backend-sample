@@ -1,0 +1,86 @@
+{
+    "$id": "client_company_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "1.0.0",
+    "definitions": {
+        "create": {
+            "type": "object",
+            "description": "Payload for POST /v3/companies",
+            "required": [
+                "name",
+                "country",
+                "certificate",
+                "incorporated_on"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "country": {
+                    "$ref": "server_definitions_v3#/definitions/country"
+                },
+                "certificate": {
+                    "type": "string"
+                },
+                "incorporated_on": {
+                    "$ref": "server_definitions_v3#/definitions/date"
+                }
+            },
+            "additionalProperties": false
+        },
+        "update": {
+            "type": "object",
+            "description": "Payload for PUT /v3/companies",
+            "required": [
+                "type",
+                "name",
+                "country"
+            ],
+            "properties": {
+                "type": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "agent",
+                            "authority",
+                            "bank",
+                            "client",
+                            "receiver",
+                            "sender",
+                            "shelf"
+                        ]
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "country": {
+                    "$ref": "server_definitions_v3#/definitions/country"
+                },
+                "offices": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "certificate": {
+                    "type": "string"
+                },
+                "incorporated_on": {
+                    "$ref": "server_definitions_v3#/definitions/date"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "authority": {
+                    "type": "object"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

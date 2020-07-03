@@ -1,0 +1,15 @@
+{
+    "$id": "entity_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "1.0.0",
+    "type": "object",
+    "title": "Entity schema. Version 3",
+    "oneOf": [
+        {
+            "$ref": "company_v3"
+        },
+        {
+            "$ref": "person_v3"
+        }
+    ]
+}

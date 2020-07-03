@@ -1,0 +1,54 @@
+{
+    "$id": "share_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "0.9.0",
+    "type": "object",
+    "required": [
+        "type",
+        "name",
+        "quantity",
+        "date"
+    ],
+    "allOf": [
+        {
+            "$ref": "base.json"
+        },
+        {
+            "properties": {
+                "schema_id": {
+                    "const": "share_v3"
+                },
+                "type": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "allocation"
+                        ]
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "examples": [
+                        "Share Allocation"
+                    ]
+                },
+                "quantity": {
+                    "type": "number",
+                    "examples": [
+                        10
+                    ]
+                },
+                "date": {
+                    "$ref": "server_definitions_v3#/definitions/date"
+                },
+                "relations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "server_definitions_v3#/definitions/relation"
+                    }
+                }
+            }
+        }
+    ]
+}

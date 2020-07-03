@@ -1,0 +1,11 @@
+{
+    "$id": "courier_v3",
+    "version": "0.0.1",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Courier schema. Version 3",
+    "type": "object",
+    "additionalProperties": false,
+
+    "properties": {
+    }
+}

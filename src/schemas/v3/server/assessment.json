@@ -1,0 +1,107 @@
+{
+    "$id": "assessment_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "0.9.0",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "type": "string"
+        },
+        "template": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "jurisdiction": {
+            "type": "string"
+        },
+        "assessed_on": {
+            "type": "string"
+        },
+        "percent": {
+            "type": "string"
+        },
+        "comment": {
+            "type": "string"
+        },
+        "entered_by": {
+            "$ref": "server_definitions_v3#/definitions/entered_by"
+        },
+        "entity": {
+            "$ref": "server_definitions_v3#/definitions/entity"
+        },
+        "risks": {
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "values": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "weight": {
+                                                "type": "integer"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "weight",
+                                            "name"
+                                        ],
+                                        "additionalProperties": false
+                                    }
+                                }
+                            },
+                            "optional": [
+                                "values"
+                            ],
+                            "required": [
+                                "description"
+                            ],
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                "required": [
+                    "name",
+                    "type",
+                    "items"
+                ],
+                "additionalProperties": false
+            }
+        }
+    },
+    "required": [
+        "schema_id",
+        "class",
+        "assessed_on",
+        "entered_by",
+        "entity",
+        "risks"
+    ],
+    "additionalProperties": false
+}

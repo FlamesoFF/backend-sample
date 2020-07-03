@@ -1,0 +1,6 @@
+{
+    "name": "API",
+    "script": "./src/api/main.ts",
+    "interpreter": "ts-node",
+    "args": "--config config.json"
+}

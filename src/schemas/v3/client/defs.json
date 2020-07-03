@@ -1,0 +1,58 @@
+{
+    "$id": "client_definitions_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "1.0.0",
+    "definitions": {
+        "list_item_standard": {
+            "$id": "list_item_standard",
+            "type": "object",
+            "description": "Basic properties for all possible list items of this API",
+            "properties": {
+                "_id": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "class": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            },
+            "required": [
+                "_id",
+                "class"
+            ]
+        },
+        "list_standard": {
+            "type": "array",
+            "description": "Standard list of this API",
+            "items": {
+                "$ref": "list_item_standard"
+            }
+        },
+        "date": {
+            "$id": "date",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "examples": [
+                "2010-01-01"
+            ]
+        },
+        "datetime": {
+            "$id": "datetime",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$",
+            "examples": [
+                "2010-01-01 12:58"
+            ]
+        },
+        "dateiso": {
+            "$id": "dateiso",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{1,4}[A-Z]$",
+            "examples": [
+                "2019-08-02T11:22:47.165Z",
+                "2001-05-31T12:54:32.165Z"
+            ]
+        }
+    }
+}

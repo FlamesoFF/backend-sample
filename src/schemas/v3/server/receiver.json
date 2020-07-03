@@ -1,0 +1,33 @@
+{
+    "$id": "receiver_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "0.9.0",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "company": {
+            "type": "string"
+        },
+        "country": {
+            "$ref": "server_definitions_v3#/definitions/country"
+        },
+        "address": {
+            "type": "string"
+        },
+        "contact": {
+            "$ref": "server_definitions_v3#/definitions/user"
+        }
+    },
+    "required": [
+        "address",
+        "contact"
+    ],
+    "additionalProperties": false
+}

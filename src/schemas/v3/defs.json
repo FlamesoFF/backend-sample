@@ -1,0 +1,12 @@
+{
+    "$id": "common_definitions_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "1.0.0",
+    "definitions": {
+        "email": {
+            "$id": "email",
+            "type": "string",
+            "pattern": "^([a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)$"
+        }
+    }
+}

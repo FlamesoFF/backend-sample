@@ -1,0 +1,140 @@
+{
+    "$id": "person_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "1.0.0",
+    "type": "object",
+    "title": "Person schema. Version 3",
+    "required": [
+        "schema_id",
+        "class",
+        "name",
+        "date_of_birth",
+        "country_of_birth"
+    ],
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "allOf": [
+                {
+                    "$ref": "server_definitions_v3#/definitions/schema_id"
+                },
+                {
+                    "const": "person_v3"
+                }
+            ]
+        },
+        "class": {
+            "allOf": [
+                {
+                    "$ref": "server_definitions_v3#/definitions/class"
+                },
+                {
+                    "const": "person"
+                }
+            ]
+        },
+        "name": {
+            "type": "string",
+            "examples": [
+                "John Doe"
+            ]
+        },
+        "modified_by": {
+            "type": "object",
+            "required": [
+                "_id",
+                "name"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string",
+                    "examples": [
+                        "tester"
+                    ]
+                },
+                "name": {
+                    "type": "string",
+                    "examples": [
+                        "Tester"
+                    ]
+                }
+            }
+        },
+        "address": {
+            "type": "string",
+            "examples": [
+                "Main Avenue, 1234"
+            ]
+        },
+        "country": {
+            "$ref": "server_definitions_v3#/definitions/country"
+        },
+        "country_of_birth": {
+            "type": "string",
+            "examples": [
+                "USA"
+            ]
+        },
+        "date_of_birth": {
+            "$ref": "server_definitions_v3#/definitions/date"
+        },
+        "email": {
+            "$ref": "server_definitions_v3#/definitions/email"
+        },
+        "initials": {
+            "$ref": "server_definitions_v3#/definitions/initials"
+        },
+        "nationality": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "examples": [
+                    "American"
+                ]
+            }
+        },
+        "occupation": {
+            "type": "string",
+            "examples": [
+                "worker"
+            ]
+        },
+        "organization": {
+            "type": "string",
+            "examples": [
+                "NASA"
+            ]
+        },
+        "phone": {
+            "$ref": "server_definitions_v3#/definitions/phone"
+        },
+        "place_of_birth": {
+            "type": "string",
+            "examples": [
+                "New York"
+            ]
+        },
+        "type": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "examples": [
+                    "agent",
+                    "client"
+                ]
+            }
+        },
+        "relations": {
+            "type": "array",
+            "items": {
+                "$ref": "server_definitions_v3#/definitions/relation"
+            }
+        }
+    },
+    "additionalProperties": false
+}

@@ -1,0 +1,11 @@
+/.idea
+/.vscode
+/node_modules
+/dist
+/logs
+/tests/temp/**/*
+
+config.json
+config-*.json
+yarn-error.log
+docker

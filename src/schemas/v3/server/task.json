@@ -1,0 +1,171 @@
+{
+    "$id": "task_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "1.0.0",
+    "type": "object",
+    "title": "Task schema. Version 3",
+    "required": [
+        "_id",
+        "_rev",
+        "class",
+        "schema_id",
+        "type",
+        "created_on",
+        "time_track",
+        "content"
+    ],
+    "allOf": [
+        {
+            "$ref": "base.json"
+        },
+        {
+            "properties": {
+                "schema_id": {
+                    "const": "task_v3"
+                },
+                "class": {
+                    "const": "task"
+                },
+                "estimated_time": {
+                    "type": "string",
+                    "examples": [
+                        "0"
+                    ]
+                },
+                "type": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "work",
+                            "break",
+                            "reminder",
+                            "template"
+                        ]
+                    }
+                },
+                "completed_on": {
+                    "$ref": "defs.json#/definitions/dateiso"
+                },
+                "created_on": {
+                    "$ref": "defs.json#/definitions/dateiso"
+                },
+                "time_track": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "time_records",
+                            "who"
+                        ],
+                        "properties": {
+                            "time_records": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "anyOf": [
+                                        {
+                                            "required": [
+                                                "created"
+                                            ],
+                                            "$ref": "#/definitions/time_record"
+                                        },
+                                        {
+                                            "required": [
+                                                "created",
+                                                "start"
+                                            ],
+                                            "$ref": "#/definitions/time_record"
+                                        },
+                                        {
+                                            "required": [
+                                                "created",
+                                                "start",
+                                                "end"
+                                            ],
+                                            "$ref": "#/definitions/time_record"
+                                        }
+                                    ]
+                                }
+                            },
+                            "who": {
+                                "type": "object",
+                                "required": [
+                                    "_id",
+                                    "name",
+                                    "initials"
+                                ],
+                                "properties": {
+                                    "_id": {
+                                        "type": "string",
+                                        "examples": [
+                                            "tester"
+                                        ]
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "examples": [
+                                            "Tester"
+                                        ]
+                                    },
+                                    "initials": {
+                                        "type": "string",
+                                        "examples": [
+                                            "TE"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "content": {
+                    "type": "string",
+                    "examples": [
+                        "New task!"
+                    ]
+                },
+                "notes": {
+                    "type": "string",
+                    "examples": [
+                        "everything is working"
+                    ]
+                },
+                "reminder_time": {
+                    "$ref": "defs.json#/definitions/dateiso"
+                },
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "defs.json#/definitions/comment"
+                    }
+                },
+                "relations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "defs.json#/definitions/relation"
+                    }
+                }
+            }
+        }
+    ],
+    "definitions": {
+        "time_record": {
+            "type": "object",
+            "required": [
+                "created"
+            ],
+            "properties": {
+                "created": {
+                    "$ref": "defs.json#/definitions/dateiso"
+                },
+                "start": {
+                    "$ref": "defs.json#/definitions/dateiso"
+                },
+                "end": {
+                    "$ref": "defs.json#/definitions/dateiso"
+                }
+            }
+        }
+    }
+}

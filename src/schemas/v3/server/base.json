@@ -1,0 +1,38 @@
+{
+    "$id": "base_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "1.0.0",
+    "title": "Fundamental schema. Version 3",
+    "type": "object",
+    "required": [
+        "schema_id",
+        "class"
+    ],
+    "properties": {
+        "_id": {
+            "type": "string",
+            "examples": [
+                "f1e57320b5280553917ea2f20abbb991"
+            ]
+        },
+        "_rev": {
+            "type": "string",
+            "pattern": "[0-9]{1,6}-[a-z0-9]{32}",
+            "examples": [
+                "5-b4f2ac722c844de8f16d96b20b4f372d"
+            ]
+        },
+        "schema_id": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string",
+            "enum": [
+                "person",
+                "company",
+                "order",
+                "document"
+            ]
+        }
+    }
+}

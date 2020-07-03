@@ -1,0 +1,110 @@
+{
+    "$id": "company_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "1.0.0",
+    "type": "object",
+    "title": "Company schema. Version 3",
+    "required": [
+        "schema_id",
+        "class",
+        "name",
+        "country"
+    ],
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "allOf": [
+                {
+                    "$ref": "server_definitions_v3#/definitions/schema_id"
+                },
+                {
+                    "const": "company_v3"
+                }
+            ]
+        },
+        "class": {
+            "allOf": [
+                {
+                    "$ref": "server_definitions_v3#/definitions/class"
+                },
+                {
+                    "const": "company"
+                }
+            ]
+        },
+        "type": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "string",
+                    "enum": [
+                        "agent",
+                        "authority",
+                        "bank",
+                        "client",
+                        "receiver",
+                        "sender",
+                        "shelf"
+                    ]
+                }
+            ]
+        },
+        "offices": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "name": {
+            "type": "string"
+        },
+        "certificate": {
+            "type": "string"
+        },
+        "incorporated_on": {
+            "$ref": "server_definitions_v3#/definitions/dateiso"
+        },
+        "status": {
+            "type": "string"
+        },
+        "authority": {
+            "type": "object"
+        },
+        "country": {
+            "$ref": "server_definitions_v3#/definitions/country"
+        },
+        "modified_by": {
+            "type": "object",
+            "required": [
+                "_id",
+                "name"
+            ],
+            "properties": {
+                "_id": {
+                    "type": "string",
+                    "examples": [
+                        "tester"
+                    ]
+                },
+                "name": {
+                    "type": "string",
+                    "examples": [
+                        "Tester"
+                    ]
+                }
+            }
+        },
+        "relations": {
+            "type": "array",
+            "items": {
+                "$ref": "server_definitions_v3#/definitions/relation"
+            }
+        }
+    },
+    "additionalProperties": false
+}

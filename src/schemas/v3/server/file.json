@@ -1,0 +1,90 @@
+{
+    "$id": "file_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "0.9.0",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "extension": {
+            "type": "string"
+        },
+        "created_on": {
+            "type": "string"
+        },
+        "created_by": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "email"
+            ]
+        },
+        "relations": {
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "class": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "entity_id": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "relation": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "_id",
+                    "class",
+                    "type"
+                ]
+            }
+        }
+    },
+    "required": [
+        "schema_id",
+        "class",
+        "name",
+        "extension",
+        "created_on",
+        "created_by"
+    ],
+    "additionalProperties": false
+}

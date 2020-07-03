@@ -1,0 +1,85 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "env": {
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 10,
+    "sourceType": "module"
+  },
+  "rules": {
+    "prefer-spread": "error",
+    "no-useless-call": "error",
+    "no-lonely-if": "off",
+    "newline-after-var": "warn",
+    "newline-before-return": "warn",
+    "object-shorthand": "warn",
+    "valid-typeof": "error",
+    "class-methods-use-this": "warn",
+    "no-class-assign": "error",
+    "no-restricted-properties": "error",
+    "no-prototype-builtins": "error",
+    "curly": [
+      "warn",
+      "multi-line"
+    ],
+    "guard-for-in": "warn",
+    "no-duplicate-imports": "error",
+    "no-restricted-imports": "warn",
+    "indent": [
+      "warn",
+      4,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "max-len": [
+      "warn",
+      {
+        "code": 200
+      }
+    ],
+    "no-bitwise": "off",
+    "quotes": [
+      "warn",
+      "single"
+    ],
+    "no-console": [
+      "off",
+      {
+        "allow": [
+          "warn",
+          "error",
+          "debug",
+          "time",
+          "timeEnd",
+          "trace"
+        ]
+      }
+    ],
+    "no-debugger": "off",
+    "no-empty": "warn",
+    "no-empty-function": "warn",
+    "no-useless-return": "error",
+    "getter-return": "error",
+    "no-eval": "error",
+    "prefer-const": "warn",
+    "radix": "off",
+    "no-extra-semi": "warn",
+    "semi": [
+      "error",
+      "always"
+    ],
+    "semi-style": [
+      "error",
+      "last"
+    ],
+    "eqeqeq": [
+      "error",
+      "always"
+    ]
+  }
+}

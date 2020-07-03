@@ -1,0 +1,152 @@
+{
+    "$id": "order_v3",
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "version": "1.0.0",
+    "type": "object",
+    "title": "Order schema. Version 3",
+    "required": [
+        "schema_id",
+        "class",
+        "number",
+        "created_on",
+        "statuses"
+    ],
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "allOf": [
+                {
+                    "$ref": "server_definitions_v3#/definitions/schema_id"
+                },
+                {
+                    "const": "order_v3"
+                }
+            ]
+        },
+        "class": {
+            "allOf": [
+                {
+                    "$ref": "server_definitions_v3#/definitions/class"
+                },
+                {
+                    "const": "order"
+                }
+            ]
+        },
+        "number": {
+            "type": "string",
+            "pattern": "ORD-\\d{6}[A-Z]{2}",
+            "examples": [
+                "ORD-123456QW"
+            ]
+        },
+        "created_on": {
+            "$ref": "server_definitions_v3#/definitions/date"
+        },
+        "type": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "order_date": {
+            "$ref": "server_definitions_v3#/definitions/date"
+        },
+        "companies": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "ids of companies"
+        },
+        "client_reference": {
+            "type": "string",
+            "pattern": "^\\w{2}-[\\w\\d]{9}$",
+            "examples": [
+                "AO-20160614A"
+            ]
+        },
+        "tags": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "examples": [
+                    "CGS+",
+                    "A19"
+                ]
+            }
+        },
+        "statuses": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "enum": [
+                        "new",
+                        "in process",
+                        "cleared",
+                        "waiting",
+                        "declined",
+                        "n/a"
+                    ]
+                },
+                "compliance": {
+                    "type": "string",
+                    "enum": [
+                        "new",
+                        "in process",
+                        "cleared",
+                        "waiting",
+                        "declined",
+                        "n/a"
+                    ]
+                },
+                "client": {
+                    "type": "string",
+                    "enum": [
+                        "new",
+                        "pending",
+                        "confirmed",
+                        "cancelled"
+                    ]
+                },
+                "order": {
+                    "type": "string",
+                    "enum": [
+                        "creating",
+                        "pending",
+                        "new",
+                        "in process",
+                        "waiting",
+                        "done",
+                        "cancelled"
+                    ]
+                }
+            }
+        },
+        "relations": {
+            "type": "array",
+            "items": {
+                "$ref": "server_definitions_v3#/definitions/relation"
+            }
+        },
+        "quotes": {
+            "type": "array",
+            "items": {
+                "$ref": "server_definitions_v3#/definitions/quote"
+            }
+        },
+        "comments": {
+            "type": "array",
+            "items": {
+                "$ref": "server_definitions_v3#/definitions/comment"
+            }
+        }
+    },
+    "additionalProperties": false
+}

@@ -28,7 +28,7 @@ export interface IFileDetails {
     sha: string;
     digest: string;
     type: string;
-    created_on: string;
+    created_on: number;
     created_by: TCreatedBy;
 
     description?: string;

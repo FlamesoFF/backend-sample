@@ -1,4 +1,4 @@
-import axios from 'axios';
+import got from 'got';
 import { CouchDbService } from '../../services/couchDb';
 import { isRelationDefined } from '../../shared/utils/typeGuards';
 import { MangoQuery } from 'nano';
@@ -6,14 +6,16 @@ import { FinancialDocument } from '../../@types/data/document';
 import { Relation } from '../../@types/types';
 
 
-const migrateInvoice = async (setting, invoiceNumber) => {
+const migrateInvoice = async ( setting, invoiceNumber ) => {
     const url = setting.defaults.endpoints['m2c-invoice'];
-    return await axios.post(url, {
-        number: invoiceNumber
+
+    return await got.post(url, {
+        json: { number: invoiceNumber },
+        responseType: 'json'
     });
 };
 
-const getInvoice = async (invoiceNumber) => {
+const getInvoice = async ( invoiceNumber ) => {
     const query: MangoQuery = {
         selector: {
             $and: [
@@ -29,16 +31,16 @@ const getInvoice = async (invoiceNumber) => {
 
     const mongoResponse = await CouchDbService.adapter.find(query);
 
-    if (mongoResponse.docs && mongoResponse.docs.length) {
+    if ( mongoResponse.docs && mongoResponse.docs.length ) {
         return mongoResponse.docs[0];
     }
     return null;
 };
 
-const processInvoices = async (courier, setting) => {
-    if (courier.invoices) {
+const processInvoices = async ( courier, setting ) => {
+    if ( courier.invoices ) {
 
-        for (const i of courier.invoices.map(i => i.value)) {
+        for ( const i of courier.invoices.map(i => i.value) ) {
 
             const relations: Relation[] = [
                 {
@@ -62,7 +64,7 @@ const processInvoices = async (courier, setting) => {
 
             let issuedByRelation = null;
 
-            if (courier.sender && courier.sender.doc_id && courier.sender.value) {
+            if ( courier.sender && courier.sender.doc_id && courier.sender.value ) {
                 issuedByRelation = {
                     type: 'issued_by',
                     node: {
@@ -81,18 +83,18 @@ const processInvoices = async (courier, setting) => {
 
             let invoice = await getInvoice(i);
 
-            if (invoice) {
-                if (invoice.relations) {
-                    relations.forEach((relation: Relation) => {
+            if ( invoice ) {
+                if ( invoice.relations ) {
+                    relations.forEach(( relation: Relation ) => {
                         const exists =
-                            invoice.relations.some((invoiceRelation: Relation) =>
+                            invoice.relations.some(( invoiceRelation: Relation ) =>
                                 relation.type === invoiceRelation.type &&
                                 (
                                     isRelationDefined(relation) && isRelationDefined(invoiceRelation)
                                 )
                             );
 
-                        if (!exists) {
+                        if ( !exists ) {
                             invoice.relations.push(relation);
                         }
                     });
@@ -101,10 +103,10 @@ const processInvoices = async (courier, setting) => {
                     await CouchDbService.adapter.insert(invoice);
                 }
             } else {
-                const result = await migrateInvoice(setting, i);
+                const {body} = await migrateInvoice(setting, i);
 
-                if (result?.data?.['m2c-invoice']) {
-                    const { id } = result.data['m2c-invoice'];
+                if ( body?.['m2c-invoice'] ) {
+                    const { id } = body['m2c-invoice'];
 
                     invoice = await CouchDbService.adapter.get(id);
                     // invoice.relations.push(hasCourierRelation);
@@ -116,12 +118,12 @@ const processInvoices = async (courier, setting) => {
     }
 };
 
-const processOrders = async (oldCourier, newCourier) => {
+const processOrders = async ( oldCourier, newCourier ) => {
     let relation = null;
-    if (oldCourier.orders) {
-        for (const order of oldCourier.orders) {
-            for (const company of order.companies) {
-                for (const document of company.documents) {
+    if ( oldCourier.orders ) {
+        for ( const order of oldCourier.orders ) {
+            for ( const company of order.companies ) {
+                for ( const document of company.documents ) {
                     relation = {
                         type: 'has_document',
                         node: {
@@ -135,7 +137,7 @@ const processOrders = async (oldCourier, newCourier) => {
                         return r.type === 'has_document' && r.node.name === relation.node.name && r.qty === relation.qty;
                     });
 
-                    if (!isRelationsCorrect) {
+                    if ( !isRelationsCorrect ) {
                         const document: FinancialDocument = {
                             entered_by: undefined,
                             entity: undefined,
@@ -165,10 +167,10 @@ const processOrders = async (oldCourier, newCourier) => {
     }
 };
 
-const mergeRelations = async (oldCourier, newCourier, setting) => {
+const mergeRelations = async ( oldCourier, newCourier, setting ) => {
     let relation = null;
 
-    if (oldCourier.receiver) {
+    if ( oldCourier.receiver ) {
         relation = {
             type: 'has_receiver',
             node: {
@@ -178,29 +180,29 @@ const mergeRelations = async (oldCourier, newCourier, setting) => {
             contact_name: oldCourier.receiver.name
         };
 
-        if (oldCourier.receiver.country) {
+        if ( oldCourier.receiver.country ) {
             //@ts-ignore
             relation.country = oldCourier.receiver.country.fields.code;
         }
 
-        if (oldCourier.receiver.structured_address) {
+        if ( oldCourier.receiver.structured_address ) {
             //@ts-ignore
             relation.structured_address = oldCourier.receiver.structured_address;
 
-            if (oldCourier.receiver.structured_address.phone) {
+            if ( oldCourier.receiver.structured_address.phone ) {
                 //@ts-ignore
                 relation.phone = oldCourier.receiver.structured_address.phone;
             }
         }
 
-        if (!newCourier.relations.some(r => {
+        if ( !newCourier.relations.some(r => {
             return r.type === 'has_receiver' && r.contact_name === relation.contact_name;
-        })) {
+        }) ) {
             newCourier.relations.push(relation);
         }
     }
 
-    if (oldCourier.manager) {
+    if ( oldCourier.manager ) {
         relation = {
             type: 'managed_by',
             node: {
@@ -209,25 +211,25 @@ const mergeRelations = async (oldCourier, newCourier, setting) => {
                 name: oldCourier.manager.value
             }
         };
-        if (oldCourier.manager.fields) {
-            if (oldCourier.manager.fields.initial) {
+        if ( oldCourier.manager.fields ) {
+            if ( oldCourier.manager.fields.initial ) {
                 //@ts-ignore
                 relation.initials = oldCourier.manager.fields.initial;
             }
-            if (oldCourier.manager.fields.emails) {
+            if ( oldCourier.manager.fields.emails ) {
                 //@ts-ignore
                 relation.emails = oldCourier.manager.fields.emails.map(e => e.address);
             }
         }
-        if (!newCourier.relations.some(r => {
+        if ( !newCourier.relations.some(r => {
             return r.type === 'managed_by' && r.node._id === relation.node._id;
-        })) {
+        }) ) {
             newCourier.relations.push(relation);
         }
     }
 
-    if (oldCourier.sender) {
-        if (oldCourier.sender.value) {
+    if ( oldCourier.sender ) {
+        if ( oldCourier.sender.value ) {
             relation = {
                 type: 'has_sender',
                 node: {
@@ -253,24 +255,24 @@ const mergeRelations = async (oldCourier, newCourier, setting) => {
             sender_name: setting.defaults.sender.name
         };
     }
-    if (!newCourier.relations.find(r => {
+    if ( !newCourier.relations.find(r => {
         return r.type === 'has_sender' && r.node._id === relation.node._id;
-    })) {
+    }) ) {
         newCourier.relations.push(relation);
     }
     await processOrders(oldCourier, newCourier);
 };
 
-const processCourier = async (oldCourier, setting) => {
+const processCourier = async ( oldCourier, setting ) => {
     let newCourier = null;
     try {
         newCourier = await CouchDbService.adapter.get(oldCourier._id);
-    } catch (error) {
-        if (error.reason !== 'missing' && error.reason !== 'deleted') {
+    } catch ( error ) {
+        if ( error.reason !== 'missing' && error.reason !== 'deleted' ) {
             throw error;
         }
     }
-    if (!newCourier) {
+    if ( !newCourier ) {
         newCourier = {
             _id: oldCourier._id,
             class: 'courier',
@@ -282,7 +284,7 @@ const processCourier = async (oldCourier, setting) => {
     }
     try {
         await mergeRelations(oldCourier, newCourier, setting);
-    } catch (error) {
+    } catch ( error ) {
         console.error(error);
     }
 
@@ -293,12 +295,12 @@ const processCourier = async (oldCourier, setting) => {
 };
 
 const script = {
-    apply: async (change, setting) => {
+    apply: async ( change, setting ) => {
         const isDeleted = change.deleted;
         const courier = change.doc;
         console.log(courier._id);
 
-        if (isDeleted) {
+        if ( isDeleted ) {
             //handle delete
         } else {
             await processCourier(courier, setting);

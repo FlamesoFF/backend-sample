@@ -1,4 +1,4 @@
-import axios from 'axios';
+import got from 'got';
 import elasticsearch from 'elasticsearch';
 import mysql from 'mysql';
 import util from 'util';
@@ -6,17 +6,16 @@ import { getConfig } from './utils/helper';
 
 const
     // elasticsearch = require('elasticsearch'),
-    // axios = require('axios'),
     // util = require('util'),
     config = getConfig(),
-    mysqlSetting = config.mysql.apollo,
+    mysqlSetting = config.mysql.main,
     // mysql = require('mysql'),
     mysqlDb = mysql.createPool({
         host: mysqlSetting.host,
         user: mysqlSetting.username,
         password: mysqlSetting.password,
         database: mysqlSetting.database,
-        port: mysqlSetting.port
+        port: mysqlSetting.ports
     }),
     esSetting = config.elasticsearch,
     client = new elasticsearch.Client({
@@ -153,7 +152,7 @@ const createTask = async (company) => {
         }
     };
 
-    return await axios.post(TASK_ENDPOINT, payload);
+    return await got.post(TASK_ENDPOINT, { json: payload });
 };
 
 function sleep(ms) {
@@ -187,7 +186,7 @@ const processCompanyList = async (companies) => {
 
 const processDocument = async (document, setting) => {
     if (document.completed) {
-        if (document.type && document.type.includes('kyc-inspection') && document.content === 'On-going Monitoring Inspection: check task in Data Base/Inspections to follow up') {
+        if (document.type && document.type.includes('kyc-inspection') && document.description === 'On-going Monitoring Inspection: check task in Data Base/Inspections to follow up') {
             await updateStatus(document);
         }
         const manager = document.responsible.doc_id;

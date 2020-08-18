@@ -1,0 +1,72 @@
+{
+    "_id": "sender_2.0.0",
+    "_rev": "6-b694d3f07f8a728816f021a0268196f5",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "sender",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "code": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "address": {
+            "type": "string"
+        },
+        "contact": {
+            "anyOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "_id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "phone": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "phone"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "_id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "email": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "email"
+                    ]
+                }
+            ]
+        }
+    },
+    "required": [
+        "address",
+        "contact",
+        "code"
+    ],
+    "additionalProperties": false
+}

@@ -1,34 +1,44 @@
 import { NextFunction, Request, Response } from 'express';
-import { apiLogger } from '../../service-logger';
 import { ApiError } from '../errors';
 import statuses from 'statuses';
-import { ApiResponse } from './response';
+import { isApiError } from '../../shared/utils/typeGuards';
+import { ResponseDirector } from './response';
 
+
+type AppError = ApiError & Error;
 
 export function apiErrorHandler(
-    error: ApiError & Error,
+    error: AppError,
     request: Request,
     response: Response,
     next: NextFunction
 ) {
-    const { code } = error;
-    const formattedResponse = new ApiResponse(false);
+    const formattedResponse = ResponseDirector.buildErrorResponse({errors: [error]});
 
-    ApiResponse.addError(formattedResponse, error);
+    if (isApiError(error)) {
+        response.status(getResponseCode(error));
+    }
 
-    switch (code) {
-        case 404:
-            response.status(statuses('Not Found'));
+    response.send(formattedResponse);
+}
+
+
+function getResponseCode(error: ApiError) {
+    let code: number;
+
+    switch (error.code) {   // Convert API error code to HTTP code
+        // Auth
+        case 600:
+        case 601:
+        case 602:
+        case 603:
+        case 604:
+            code = statuses('Unauthorized');    // 401
             break;
-        case 401:
-            response.status(statuses('Not Found'));
-            break;
-
         default:
-            response.status(statuses(500));
+            code = statuses('Internal Server Error');   // 500
             break;
     }
 
-    // apiLogger.logError({ message: formattedResponse, data: stack });
-    response.send(formattedResponse);
+    return code;
 }

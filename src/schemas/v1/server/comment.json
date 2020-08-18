@@ -1,0 +1,119 @@
+{
+  "_id": "comments_v1",
+  "name": "comments_schema",
+  "type": "object",
+  "commented": true,
+  "properties": {
+    "comments": {
+      "type": "array",
+      "required": true,
+      "template": "comment_first.tmpl",
+      "properties": {
+        "#": {
+          "type": "object",
+          "template": "comment",
+          "tostring": [
+            "$author",
+            " : ",
+            "$body"
+          ],
+          "properties": {
+            "body": {
+              "type": "string",
+              "required": true
+            },
+            "author": {
+              "type": "documentlinkv2",
+              "required": true,
+              "mainkey": "name",
+              "url": "_design/s_employee/_list/array/all",
+              "schema": "employee_schema",
+              "keys": [],
+              "properties": {
+                "doc_id": {
+                  "type": "string",
+                  "default": null,
+                  "required": true,
+                  "show": [
+                    "admin"
+                  ]
+                },
+                "value": {
+                  "type": "string",
+                  "required": true
+                },
+                "fields": {
+                  "type": "object",
+                  "display": "Additional fields",
+                  "required": true,
+                  "template": "blue"
+                }
+              }
+            },
+            "created_on": {
+              "type": "date",
+              "required": true,
+              "regexp": "^\\d\\d\\d\\d-\\d\\d-\\d\\d$",
+              "instruction": "Format of date must be YYYY-MM-DD (ex. 2001-01-01)"
+            },
+            "created_on_time": {
+              "type": "string",
+              "required": true,
+              "regexp": "^\\d\\d\\:\\d\\d:\\d\\d$",
+              "instruction": "Format of time must be HH-MM-SS (ex. 16:01:01)"
+            },
+            "comments": {
+              "type": "link",
+              "url": "comments_schema/comments",
+              "template": "comment_inner.tmpl",
+              "tostring": [
+                "sub comments: ",
+                "$self"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "_id": {
+      "type": "string",
+      "show_roles": [
+        "_admin"
+      ]
+    },
+    "_rev": {
+      "type": "string",
+      "show_roles": [
+        "_admin"
+      ]
+    },
+    "_attachments": {
+      "type": "link",
+      "url": "shares_schema/_attachments"
+    },
+    "changes": {
+      "type": "link",
+      "url": "shares_schema/changes"
+    },
+    "history": {
+      "type": "link",
+      "url": "shares_schema/historyv2"
+    },
+    "type": {
+      "type": "link",
+      "url": "shares_schema/type",
+      "properties": {
+        "#": {
+          "default": "comments"
+        }
+      }
+    },
+    "doc_id": {
+      "type": "string",
+      "required": true,
+      "show": [
+        "admin"
+      ]
+    }
+  }
+}

@@ -24,8 +24,7 @@
                     "type": "string"
                 },
                 "date": {
-                    "type": "string",
-                    "format": "date"
+                    "$ref": "client_definitions_v3#/definitions/date"
                 },
                 "tags": {
                     "type": "array",
@@ -33,11 +32,8 @@
                         "type": "string"
                     }
                 },
-                "company_ids": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
+                "company_id": {
+                    "type": "string"
                 },
                 "quotes": {
                     "type": "array",
@@ -50,25 +46,38 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "companies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "client_reference": {
+                    "type": "string"
+                },
+                "client_id": {
+                    "type": "string"
+                },
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             },
             "required": [
                 "accounts_status",
                 "client_status",
-                "company_ids",
                 "compliance_status",
-                "date",
-                "order_status",
-                "quotes",
-                "tags",
-                "thread_ids"
+                "order_status"
             ]
         },
         "update": {
             "$ref": "#/definitions/create",
             "required": []
         },
-        "list_item": {
+        "item": {
             "$id": "external_order_list_item",
             "type": "object",
             "description": "Order item for External GET /v3/orders/<id>",
@@ -102,15 +111,24 @@
                     }
                 },
                 "company_id": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "client_reference": {
-                    "type": "null"
-                },
-                "data": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "stamp": {
                     "$ref": "client_definitions_v3#/definitions/dateiso"
@@ -118,7 +136,7 @@
                 "client_id": {
                     "oneOf": [
                         {
-                            "$ref": "server_definitions_v3#/definitions/email"
+                            "type": "string"
                         },
                         {
                             "type": "null"
@@ -126,12 +144,87 @@
                     ]
                 },
                 "contact_email": {
-                    "type": "null"
+                    "oneOf": [
+                        {
+                            "$ref": "common_definitions_v3#/definitions/email"
+                        },
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "contact_id": {
-                    "type": "string"
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
                 },
                 "thread_ids": {
+                    "oneOf": [
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "order_status_changed_on": {
+                    "oneOf": [
+                        {
+                            "$ref": "client_definitions_v3#/definitions/dateiso"
+                        },
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "compliance_officer_id": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "compliance_status_reason": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "quotes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "companies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "comments": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -143,14 +236,11 @@
                 "client_reference",
                 "client_status",
                 "compliance_status",
-                "contact_id",
                 "manager_id",
                 "order_date",
                 "order_id",
                 "order_status",
-                "stamp",
-                "tags",
-                "thread_ids"
+                "tags"
             ]
         }
     }

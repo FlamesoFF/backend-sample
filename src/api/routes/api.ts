@@ -1,13 +1,13 @@
 import express from 'express';
-import companies from './companies';
-import couriers from './couriers';
-import orders from './orders';
-import contacts from './contacts';
-import relations from './relations';
-import persons from './persons';
-import entities from './entities';
-import files from './files';
-import tasks from './tasks';
+import companies from './private/companies';
+import couriers from './private/couriers';
+import orders from './private/orders';
+import contacts from './private/contacts';
+import relations from './private/relations';
+import persons from './private/persons';
+import entities from './private/entities';
+import files from './private/files';
+import tasks from '../modules/tasks/routes';
 
 
 export default express.Router({ mergeParams: true })

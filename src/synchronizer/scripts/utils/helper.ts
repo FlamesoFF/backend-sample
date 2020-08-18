@@ -1,4 +1,3 @@
-import check from 'check-types';
 import { DocumentGetParams, DocumentGetResponse } from 'nano';
 import nconf from 'nconf';
 import path from 'path';
@@ -18,14 +17,14 @@ const {
 
 export class Strings {
 
-    static capitalize(str: string = '') {
+    static capitalize( str: string = '' ) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    static cleanName(str: string = '') {
+    static cleanName( str: string = '' ) {
         try {
             return str.replace(/["\\]/g, '');
-        } catch (error) {
+        } catch ( error ) {
             return str;
         }
     }
@@ -38,7 +37,7 @@ export class Arrays {
      * @param {Array} b
      * @returns Array
      */
-    static intersection(a, b) {
+    static intersection( a, b ) {
         const s1 = new Set(a);
         const s2 = new Set(b);
 
@@ -48,11 +47,11 @@ export class Arrays {
 
 export class Objects {
 
-    static pickProps(object: object, props: string[]): IndexSignature {
+    static pickProps( object: object, props: string[] ): IndexSignature {
         const picked = {};
 
         new Set(props).forEach(prop => {
-            if (object[prop]) {
+            if ( object[prop] ) {
                 picked[prop] = object[prop];
             }
 
@@ -61,12 +60,12 @@ export class Objects {
         return picked;
     }
 
-    static extractProps(object: object, getters: { [key: string]: PropertyGetter }): IndexSignature {
+    static extractProps( object: object, getters: { [key: string]: PropertyGetter } ): IndexSignature {
         const extracted = {};
         const keys = Object.keys(getters);
 
         new Set(keys).forEach(key => {
-            if (getters[key](object)) extracted[key] = getters[key](object);
+            if ( getters[key](object) ) extracted[key] = getters[key](object);
         });
 
         return extracted;
@@ -77,33 +76,30 @@ export class Objects {
      * @param {Object} object
      * @returns Object
      */
-    static getFlat = (object) => {
+    static getFlat = ( object: any ) => {
 
-        if (check.not.object(object)) {
-            return {};
-        }
+        object = object ?? {};
 
+        return Object.entries(object)
+            .reduce(( accumulator, [key, value] ) => {
 
-        return Object.entries(object).reduce((accumulator, [key, value]) => {
+                if (
+                    value !== undefined &&
+                    value !== null &&
+                    typeof value !== "object"
+                ) {
+                    accumulator[key] = value;
+                }
 
-            if (
-                check.not.undefined(value) &&
-                check.not.null(value) &&
-                check.not.object(value)
-            ) {
-                accumulator[key] = value;
-            }
+                return accumulator;
 
-
-            return accumulator;
-
-        }, {});
+            }, {});
 
     }
 }
 
 export class Relations {
-    getCLassByType(type) {
+    getCLassByType( type ) {
 
     }
 }
@@ -113,6 +109,9 @@ export const args = () => {
     return _args;
 };
 
+/**
+ * @deprecated
+ */
 export const getConfig = () => {
     const configFilePath = path.resolve(__dirname, '../..', config || 'config.js');
 
@@ -136,17 +135,17 @@ export namespace NanoDB {
     }
 
     // TODO: make this resolve automatically. One adapter with auto-switching between DBs.
-    export const get = async ({ dbName, id, params }: GetParams): Promise<(DocumentGetResponse & ApolloDocument) | null> => {
+    export const get = async ( { dbName, id, params }: GetParams ): Promise<(DocumentGetResponse & ApolloDocument) | null> => {
         CouchDbService.switchDb(dbName);
 
         try {
             return await CouchDbService.adapter.get(id, params);
-        } catch (error) {
+        } catch ( error ) {
             return null;
         }
     };
 
-    export const getPreviousRevision = async (dbName: string, id: string): Promise<ApolloDocument | null> => {
+    export const getPreviousRevision = async ( dbName: string, id: string ): Promise<ApolloDocument | null> => {
         let docAvailable = false;
         let revision = '';
 
@@ -166,12 +165,12 @@ export namespace NanoDB {
             });
 
             revision = rev;
-            if (status === 'available') docAvailable = true;
+            if ( status === 'available' ) docAvailable = true;
 
-        } catch (error) {
+        } catch ( error ) {
         }
 
-        if (docAvailable) {
+        if ( docAvailable ) {
             return await get({
                 dbName,
                 id,

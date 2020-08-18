@@ -55,7 +55,7 @@ export class RelationModel implements IRelation {
         } = document;
 
         if (isTask(document)) {
-            name = document.content;
+            name = document.description;
         } else if (isDocumentWithName(document)) {
             name = document.name;
         }

@@ -1,8 +1,8 @@
 import { CouchDbService } from '../../services/couchDb';
-import { Document, DocumentGetResponse } from 'nano';
+import { DocumentGetResponse, MaybeDocument } from 'nano';
 
 
-interface StatsDocument extends Document {
+export interface StatsDocument extends MaybeDocument {
     orders: {
         number: number
     }
@@ -32,8 +32,8 @@ export class StatsController {
     }
 
 
-    private static async loadStats(): Promise<StatsDocument> {
-        return await CouchDbService.adapter.get('stats') as StatsDocument;
+    private static async loadStats(): Promise<StatsDocument & DocumentGetResponse> {
+        return await CouchDbService.adapter.get('stats') as any;
     }
 
     private static async saveStats(doc: DocumentGetResponse & StatsDocument) {

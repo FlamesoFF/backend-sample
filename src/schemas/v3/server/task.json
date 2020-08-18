@@ -26,6 +26,20 @@
                 "class": {
                     "const": "task"
                 },
+                "timestamps": {
+                    "type": "object",
+                    "properties": {
+                        "created": {
+                            "$ref": "defs.json#/definitions/dateiso"
+                        },
+                        "reminder": {
+                            "$ref": "defs.json#/definitions/dateiso"
+                        },
+                        "completed": {
+                            "$ref": "defs.json#/definitions/dateiso"
+                        }
+                    }
+                },
                 "estimated_time": {
                     "type": "string",
                     "examples": [
@@ -43,12 +57,6 @@
                             "template"
                         ]
                     }
-                },
-                "completed_on": {
-                    "$ref": "defs.json#/definitions/dateiso"
-                },
-                "created_on": {
-                    "$ref": "defs.json#/definitions/dateiso"
                 },
                 "time_track": {
                     "type": "array",
@@ -119,7 +127,7 @@
                         }
                     }
                 },
-                "content": {
+                "description": {
                     "type": "string",
                     "examples": [
                         "New task!"
@@ -130,9 +138,6 @@
                     "examples": [
                         "everything is working"
                     ]
-                },
-                "reminder_time": {
-                    "$ref": "defs.json#/definitions/dateiso"
                 },
                 "comments": {
                     "type": "array",

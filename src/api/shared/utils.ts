@@ -1,37 +1,36 @@
-import check from 'check-types';
 import moment from 'moment';
 import { DocumentFetchResponse, MangoResponse } from 'nano';
 import { Path, QueryResult } from 'neo4j-driver';
 import { QueryResultRow } from 'pg';
-import { ApolloJwtToken } from '../@types/auth/definitions';
 import { Responses } from '../@types/api/controllers.types';
 import { IRelation } from '../../@types/data/definitions';
 import { IFileDocument } from '../../@types/data/file';
 import { IOrder } from '../../@types/data/order';
-import { ITask, ITaskParsedInput, ITimeRecord, ITimeTrack } from '../../@types/data/task';
 import { TASK_DATE_PATTERN } from '../constants';
 import { ApolloDocument, NodeAmbiguous, Relation, RelationAbstract, TRelation } from '../../@types/types';
 import { isDeleted, isResponseFetch, isResponseMango, isRow } from '../../shared/utils/typeGuards';
+import { ApolloJwtToken } from '../middlewares/types';
+import { ITaskParsedInput, ITimeRecord, ITimeTrack, Task, TaskListItem } from "../modules/tasks/types";
 
 
 export namespace Utils {
 
     /** @description Removes undefined elements from an array. */
-    export const trimArray = <T>(array: T[]): T[] => {
+    export const trimArray = <T>( array: T[] ): T[] => {
         return array.filter(
-            (value: T, index: number) => value !== undefined
+            ( value: T, index: number ) => value !== undefined
         );
     };
 
     /** @description Removes properties which values are empty strings, undefined or null */
-    export const trimObject = <T extends object>(object: T) => {
+    export const trimObject = <T extends object>( object: T ) => {
         return Object.entries(object)
-            .reduce((accumulator, [key, value], index, array) => {
+            .reduce(( accumulator, [key, value], index, array ) => {
 
                 if (
-                    !check.undefined(value) &&
-                    !check.null(value) &&
-                    !check.infinity(value)
+                    value !== undefined &&
+                    value !== null &&
+                    value !== Infinity
                 ) {
                     accumulator[key] = value;
                 }
@@ -44,7 +43,7 @@ export namespace Utils {
 
     /** @description Converts string to valid MongoDB query search regular expression. */
     type TRegexOptions = 'i' | 'm';
-    export const stringToMangoQueryRegex = (string: string, options: TRegexOptions[] = []) => {
+    export const stringToMangoQueryRegex = ( string: string, options: TRegexOptions[] = [] ) => {
         let words: string[];
         const wordRegExp = /(\W+)|(\d+)/g;
 
@@ -54,15 +53,15 @@ export namespace Utils {
             .split(' ');
 
         words = words.map(word => {
-            return `(?=.*${word})`;
+            return `(?=.*${ word })`;
         });
 
         words.push('.*');
 
-        const optionsStr = options.length > 0 ? `(?${options.join('')})` : '';
+        const optionsStr = options.length > 0 ? `(?${ options.join('') })` : '';
         const wordsStr = words.join('');
 
-        return `${optionsStr}${wordsStr}`;
+        return `${ optionsStr }${ wordsStr }`;
     };
 
 
@@ -71,19 +70,19 @@ export namespace Utils {
             [K in TRelation]: any
         };
 
-        export interface ITaskListItem extends Exclude<ITask, 'relations'>, TTaskWithFlattenRelations {
+        export interface ITaskListItem extends Exclude<Task, 'relations'>, TTaskWithFlattenRelations {
         }
 
 
         export namespace Sort {
             export type TOrder = 'asc' | 'desc';
 
-            export const byDate = (rows: ITask[], order: TOrder = 'desc'): typeof rows => {
-                return rows.sort((a: ITask, b: ITask) => {
-                    const date1 = moment(a.created_on, TASK_DATE_PATTERN);
-                    const date2 = moment(b.created_on, TASK_DATE_PATTERN);
+            export const byDate = ( rows: Task[], order: TOrder = 'desc' ): typeof rows => {
+                return rows.sort(( a: Task, b: Task ) => {
+                    const date1 = moment(a.timestamps.created, TASK_DATE_PATTERN);
+                    const date2 = moment(b.timestamps.created, TASK_DATE_PATTERN);
 
-                    if (order === 'asc') {
+                    if ( order === 'asc' ) {
                         return date1.isAfter(date2) ? 1 : -1;
                     } else {
                         return date1.isAfter(date2) ? -1 : 1;
@@ -95,7 +94,7 @@ export namespace Utils {
 
         export namespace Filter {
 
-            export const fromUser = (tasks: ITask[]) => {
+            export const fromUser = ( tasks: Task[] ) => {
 
                 return tasks.filter(task => {
                     const { relations = [] } = task;
@@ -126,7 +125,7 @@ export namespace Utils {
              * @param timestamp string in ISO 8601 format
              * @returns string in ISO 8601 format
              */
-            export const toLocalTime = (timestamp: string): string => {
+            export const toLocalTime = ( timestamp: string ): string => {
                 return moment
                     .parseZone(timestamp)
                     .local()
@@ -134,19 +133,19 @@ export namespace Utils {
             };
         }
 
-        export const parseInput = (input: string): ITaskParsedInput | void => {
+        export const parseInput = ( input: string ): ITaskParsedInput | void => {
             // const regExp = /(\d{2}:\d{2})+ (\+\d{1,2})+ (\w{2,3}:)? ([\d\w ]+) (:\w{2,3})?/;
             const regExp = /(\d{2}:\d{2})? ?(\+\d{1,2})? ?((\w{2,3}):)? ?([\d\w&\\/ ]+) ?(:(\w{2,3}))?/;
             const allowedRegExp = /(?![:+\d\d\w\s&/])/;
 
             const charTest = input.match(allowedRegExp);
 
-            if (charTest && charTest.index && charTest.index < input.length) {
+            if ( charTest && charTest.index && charTest.index < input.length ) {
                 const allowed = ['a-z', ':', ' ', '+', '/', '&'];
 
                 throw new Error(`
                     Unexpected characters in task input! 
-                    Allowed characters are: <${allowed.join('>, <')}>.
+                    Allowed characters are: <${ allowed.join('>, <') }>.
                 `);
             }
 
@@ -156,7 +155,7 @@ export namespace Utils {
 
             const match = input.match(regExp);
 
-            if (match) {
+            if ( match ) {
                 const [
                     ,
                     time,
@@ -178,7 +177,7 @@ export namespace Utils {
                     to
                 };
 
-                if (text) {
+                if ( text ) {
                     parsedData.text = text.trim();
                 }
 
@@ -187,21 +186,21 @@ export namespace Utils {
             }
         };
 
-        const searchUserTrack = (time_track: ITimeTrack[], user: ApolloJwtToken): ITimeTrack | void => {
+        const searchUserTrack = ( time_track: ITimeTrack[], user: ApolloJwtToken ): ITimeTrack | void => {
             const { _id } = user;
 
             return time_track.filter(track => {
-                if (track.who) {
-                    return track.who.doc_id === _id;
+                if ( track.who ) {
+                    return track.who._id === _id;
                 }
 
             })[0];
         };
 
-        const getLastRecord = (userTrack: ITimeTrack): ITimeRecord | void => {
+        const getLastRecord = ( userTrack: ITimeTrack ): ITimeRecord | void => {
             const { time_records } = userTrack;
 
-            if (time_records) {
+            if ( time_records ) {
                 return time_records[time_records.length - 1];
             }
 
@@ -315,14 +314,14 @@ export namespace Utils {
          * }
          */
 
-        export const addStop = (task: ITask, user: ApolloJwtToken, time: string): ITask => {
+        export const addStop = ( task: Task, user: ApolloJwtToken, time: string ): Task => {
             const { time_track } = task;
-            const parsedTime = moment(time).toISOString();
+            const parsedTime = moment(time).unix();
 
-            const stop = (userTrack: ITimeTrack) => {
+            const stop = ( userTrack: ITimeTrack ) => {
                 const lastRecord = getLastRecord(userTrack);
 
-                if (lastRecord && !lastRecord.end)
+                if ( lastRecord && !lastRecord.end )
                     // lastRecord.end = moment().format(Todo.DATE_FORMAT);
                 {
                     lastRecord.end = parsedTime;
@@ -330,10 +329,10 @@ export namespace Utils {
 
             };
 
-            if (time_track) {
+            if ( time_track ) {
                 const track = searchUserTrack(time_track, user);
 
-                if (track) {
+                if ( track ) {
                     stop(track);
                 } else {
                     throw new Error('Task hasn\'t been started once!');
@@ -561,7 +560,7 @@ export namespace Utils {
 
     export namespace Neo4j {
 
-        export const queryResultsToRelationList = (response: QueryResult): (Relation<NodeAmbiguous>)[] => {
+        export const queryResultsToRelationList = ( response: QueryResult ): (Relation<NodeAmbiguous>)[] => {
             const { records } = response;
 
             return records.map(record => {
@@ -597,7 +596,7 @@ export namespace Utils {
             });
         };
 
-        export const getNeo4jNodeLabelByEntityClass = (className: string): string => {
+        export const getNeo4jNodeLabelByEntityClass = ( className: string ): string => {
             const map = new Map([
                 ['companies', 'company'],
                 ['persons', 'person'],
@@ -619,7 +618,7 @@ export namespace Utils {
         }
 
 
-        export const flattenRelations = (relations: Partial<IRelation[]>, filter: TRelation[]): IFlattenRelations => {
+        export const flattenRelations = ( relations: Partial<IRelation[]>, filter: TRelation[] ): IFlattenRelations => {
             const flatten: {
                 [key: string]: NodeAmbiguous
             } = {};
@@ -627,7 +626,7 @@ export namespace Utils {
             relations.forEach(relation => {
                 const { type, node } = relation;
 
-                if (filter.indexOf(<TRelation>type) >= 0) {
+                if ( filter.indexOf(<TRelation>type) >= 0 ) {
                     flatten[type] = node;
                 }
 
@@ -640,7 +639,7 @@ export namespace Utils {
 
     export namespace PostgreSQL {
 
-        export function resultsToList(rows: QueryResultRow[]): Responses.Lists.Generic {
+        export function resultsToList( rows: QueryResultRow[] ): Responses.Lists.Generic {
             return rows.map(item => {
                 const {
                     id: _id,
@@ -659,43 +658,45 @@ export namespace Utils {
             });
         }
 
-        export const fuzzySearchResultsToEntityList = <T extends Responses.Common.FuzzySearch>(rows: T): Responses.IEntityItem[] => rows.map(item => {
-            const {
-                id: _id,
-                class: className = '',
-                name,
-                description
-            } = item;
+        export const fuzzySearchResultsToEntityList = <T extends Responses.Common.FuzzySearch>( rows: T ): Responses.IEntityItem[] => rows.map(
+            item => {
+                const {
+                    id: _id,
+                    class: className = '',
+                    name,
+                    description
+                } = item;
 
-            return {
-                _id,
-                class: className,
-                name,
-                description
-            };
-        });
+                return {
+                    _id,
+                    class: className,
+                    name,
+                    description
+                };
+            });
 
     }
 
 
     export namespace Nano {
 
-        export type NanoResponsesWithDocs<DocType extends ApolloDocument> =
-            DocumentFetchResponse<DocType>
-            | MangoResponse<DocType>;
+        export type NanoResponsesWithDocs<D> =
+            DocumentFetchResponse<D>
+            | MangoResponse<D>;
 
 
-        export function normalizeResponse<DocType extends ApolloDocument, Response extends NanoResponsesWithDocs<DocType> = NanoResponsesWithDocs<DocType>>(response: Response): DocType[] {
-            let docs: DocType[] = [];
+
+        export function normalizeResponse<D extends ApolloDocument>( response: NanoResponsesWithDocs<D> ): D[] {
+            let docs: D[] = [];
 
 
-            if (isResponseFetch(response)) {
+            if ( isResponseFetch(response) ) {
                 docs = response.rows
                     .filter(row => !isDeleted(row) && isRow(row))
                     .map(row => isRow(row) ? row.doc : null);
             }
 
-            if (isResponseMango(response)) {
+            if ( isResponseMango(response) ) {
                 docs = response.docs;
             }
 
@@ -721,8 +722,8 @@ export namespace Utils {
                     class: className
                 };
 
-                props.forEach((prop: keyof ApolloDocument) => {
-                    if (prop in doc) {
+                props.forEach(( prop: keyof ApolloDocument ) => {
+                    if ( prop in doc ) {
                         listItem[prop] = doc[prop];
                     }
 
@@ -732,7 +733,7 @@ export namespace Utils {
             });
         };
 
-        export function resultsToFilesList<T>(docs: IFileDocument[]): Responses.Lists.Default {
+        export function resultsToFilesList<T>( docs: IFileDocument[] ): Responses.Lists.Default {
             return docs.map(doc => {
                 const {
                     _id,
@@ -752,42 +753,38 @@ export namespace Utils {
             });
         }
 
-        export const resultsToTasksList = <T>(docs: ITask[]): Responses.Lists.Task => {
-
-            type TaskListItem = Responses.Lists.Task[0];
-
-            return docs.map(doc => {
-                const relationsFilter: TRelation[] = [
-                    'related_to'
-                ];
+        export const resultsToTasksList = <T>( tasks: Task[] ): TaskListItem[] => {
+            const list = tasks.map(doc => {
+                const relationsFilter: TRelation[] = ['related_to'];
 
                 const {
                     _id,
                     class: c,
-                    content,
-                    created_on,
-                    completed_on,
+                    type,
+                    description,
+                    timestamps: {
+                        created,
+                        completed,
+                        reminder
+                    },
                     estimated_time,
-                    reminder_time,
                     notes,
                     relations,
                     comments,
-                    quotes,
                     files
                 } = doc;
 
                 const task: TaskListItem = {
                     _id,
-                    class: c,
-                    content,
-                    created_on,
-                    completed_on,
-                    // estimated_time,
-                    reminder_time,
+                    type,
+                    estimated_time,
+                    description: description,
+                    created_on: moment(created).format(TASK_DATE_PATTERN),
+                    completed_on: moment(completed).format(TASK_DATE_PATTERN),
+                    remind_on: moment(reminder).format(TASK_DATE_PATTERN),
                     notes,
-                    comments: comments.length,
-                    quotes: quotes.length,
-                    files: files.length,
+                    comments: comments,
+                    files: files,
                     ...Utils.Relations.flattenRelations(relations, relationsFilter),
                 };
 
@@ -796,9 +793,10 @@ export namespace Utils {
                 return task;
             });
 
+            return list;
         };
 
-        export function resultsToOrderList<T>(docs: IOrder[]): Responses.Lists.Generic {
+        export function resultsToOrderList<T>( docs: IOrder[] ): Responses.Lists.Generic {
             return docs.map(doc => {
                 const {
                     _id,

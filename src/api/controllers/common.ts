@@ -55,7 +55,7 @@ export const commonController = new class Controller {
         const { id } = request.params;
         const entity = await CouchDbService.adapter.get(id);
 
-        if (entity._id && entityClass && entityClass === entity.class) {
+        if (entity._id && entityClass === entity.class) {
             return await CouchDbService.adapter.destroy(id, entity._rev);
         } else {
             throw new ApiError(ERRORS.COUCH_DB.UNABLE_TO_FIND_DOCUMENT);

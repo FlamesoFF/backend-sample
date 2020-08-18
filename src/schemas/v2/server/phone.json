@@ -1,0 +1,21 @@
+{
+    "_id": "phone_2.0.0",
+    "_rev": "2-64f1083e06c00cd2d2a5fa7c4784068d",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "phone",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "type": {
+            "type": "string"
+        },
+        "value": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "value"
+    ],
+    "additionalProperties": false
+}

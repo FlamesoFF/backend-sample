@@ -1,0 +1,509 @@
+{
+    "_id": "todo_v1",
+    "name": "todo_schema",
+    "type": "object",
+    "commented": true,
+    "properties": {
+        "reference": {
+            "type": "string",
+            "required": true
+        },
+        "todos_id": {
+            "type": "string",
+            "required": true
+        },
+        "creator": {
+            "type": "documentlinkv2",
+            "required": true,
+            "mainkey": "name",
+            "url": "_design/s_employee/_list/array/all",
+            "schema": "employee_schema",
+            "keys": [],
+            "properties": {
+                "doc_id": {
+                    "type": "string",
+                    "default": null,
+                    "required": true,
+                    "show": [
+                        "admin"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "required": true
+                },
+                "fields": {
+                    "type": "object",
+                    "display": "Additional fields",
+                    "required": true,
+                    "template": "blue"
+                }
+            }
+        },
+        "content": {
+            "type": "string",
+            "logged": true,
+            "required": true,
+            "focusme": true
+        },
+        "notes": {
+            "type": "string",
+            "displayed": true
+        },
+        "created_on": {
+            "type": "string"
+        },
+        "reminder_time": {
+            "type": "string"
+        },
+        "estimated_time": {
+            "type": "number",
+            "displayed": true
+        },
+        "due_date": {
+            "type": "date",
+            "displayed": true,
+            "instruction": "Format of date must be YYYY-MM-DD(ex.2001-01-01)"
+        },
+        "completed": {
+            "type": "boolean",
+            "required": true
+        },
+        "completed_on": {
+            "type": "string",
+            "displayed": true,
+            "instruction": "Format of date must be YYYY-MM-DD(ex.2001-01-01)"
+        },
+        "position": {
+            "type": "number"
+        },
+        "responsible_group": {
+            "type": "documentlinkv2",
+            "required": true,
+            "mainkey": "name",
+            "url": "_design/s_group/all",
+            "schema": "group_schema",
+            "keys": [],
+            "properties": {
+                "doc_id": {
+                    "type": "string",
+                    "default": null,
+                    "required": true,
+                    "show": [
+                        "admin"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "required": true
+                },
+                "fields": {
+                    "type": "object",
+                    "display": "Additionalfields",
+                    "required": true,
+                    "template": "blue"
+                }
+            }
+        },
+        "responsible": {
+            "type": "documentlinkv2",
+            "required": true,
+            "mainkey": "name",
+            "url": "_design/s_employee/_list/array/all",
+            "schema": "employee_schema",
+            "keys": [],
+            "properties": {
+                "doc_id": {
+                    "type": "string",
+                    "default": null,
+                    "required": true,
+                    "show": [
+                        "admin"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "required": true
+                },
+                "fields": {
+                    "type": "object",
+                    "display": "Additionalfields",
+                    "required": true,
+                    "template": "blue"
+                }
+            }
+        },
+        "co_responsibles": {
+            "type": "array",
+            "properties": {
+                "#": {
+                    "type": "documentlinkv2",
+                    "required": true,
+                    "mainkey": "name",
+                    "url": "_design/s_employee/_list/array/all",
+                    "schema": "employee_schema",
+                    "keys": [],
+                    "properties": {
+                        "doc_id": {
+                            "type": "string",
+                            "default": null,
+                            "required": true,
+                            "show": [
+                                "admin"
+                            ]
+                        },
+                        "value": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "fields": {
+                            "type": "object",
+                            "display": "Additionalfields",
+                            "required": true,
+                            "template": "blue"
+                        }
+                    }
+                }
+            }
+        },
+        "updated": {
+            "type": "date",
+            "regexp": "^\\d\\d\\d\\d-\\d\\d-\\d\\d$",
+            "instruction": "Format of date must be YYYY-MM-DD(ex.2001-01-01)"
+        },
+        "files": {
+            "type": "link",
+            "url": "shares_schema/files"
+        },
+        "company": {
+            "type": "documentlinkv2",
+            "displayed": true,
+            "mainkey": "name",
+            "url": "_design/s_company/_list/array/all",
+            "schema": "company_schema",
+            "keys": [
+                {
+                    "key": "addresses",
+                    "schema": {
+                        "required": false,
+                        "displayed": true
+                    }
+                },
+                {
+                    "key": "contacts",
+                    "schema": {
+                        "required": false,
+                        "displayed": true
+                    }
+                }
+            ],
+            "properties": {
+                "doc_id": {
+                    "type": "string",
+                    "default": null,
+                    "required": true,
+                    "show": [
+                        "admin"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "required": true
+                },
+                "fields": {
+                    "type": "object",
+                    "display": "Additional fields",
+                    "required": true,
+                    "template": "blue",
+                    "properties": {
+                        "address": {
+                            "type": "string",
+                            "required": false,
+                            "template": "checkedit"
+                        }
+                    }
+                }
+            }
+        },
+        "client": {
+            "type": "documentlinkv2",
+            "displayed": true,
+            "mainkey": "name",
+            "url": "_design/s_client/_list/array/all",
+            "schema": "client_schema",
+            "keys": [
+                {
+                    "key": "address",
+                    "schema": {
+                        "required": false,
+                        "displayed": true
+                    }
+                },
+                {
+                    "key": "contacts",
+                    "schema": {
+                        "required": false,
+                        "displayed": true
+                    }
+                }
+            ],
+            "properties": {
+                "doc_id": {
+                    "type": "string",
+                    "default": null,
+                    "required": true,
+                    "show": [
+                        "admin"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "required": true
+                },
+                "fields": {
+                    "type": "object",
+                    "display": "Additional fields",
+                    "required": true,
+                    "template": "blue",
+                    "properties": {
+                        "address": {
+                            "type": "string",
+                            "required": false,
+                            "template": "checkedit"
+                        }
+                    }
+                }
+            }
+        },
+        "entity_type": {
+            "type": "array",
+            "show_roles": [
+                "_admin"
+            ],
+            "display": "What types of entities can be referenced for this todo",
+            "show": [
+                "admin"
+            ],
+            "properties": {
+                "#": {
+                    "type": "list",
+                    "limited": true,
+                    "items": {
+                        "company": {
+                            "description": ""
+                        },
+                        "client": {
+                            "description": ""
+                        },
+                        "agent": {
+                            "description": ""
+                        },
+                        "invoice": {
+                            "description": ""
+                        },
+                        "order": {
+                            "description": ""
+                        },
+                        "courier": {
+                            "description": ""
+                        },
+                        "person": {
+                            "description": ""
+                        },
+                        "country": {
+                            "description": ""
+                        },
+                        "authority": {
+                            "description": ""
+                        },
+                        "document": {
+                            "description": ""
+                        },
+                        "account": {
+                            "description": ""
+                        },
+                        "stock_item": {
+                            "description": ""
+                        },
+                        "transaction": {
+                            "description": ""
+                        },
+                        "employee": {
+                            "description": ""
+                        },
+                        "comments": {
+                            "description": ""
+                        },
+                        "todo": {
+                            "description": ""
+                        },
+                        "phone_bill": {
+                            "description": ""
+                        },
+                        "manager": {
+                            "description": ""
+                        },
+                        "sender": {
+                            "description": ""
+                        },
+                        "payment": {
+                            "description": ""
+                        },
+                        "bank": {
+                            "description": ""
+                        },
+                        "group": {
+                            "description": ""
+                        }
+                    },
+                    "default": ""
+                }
+            }
+        },
+        "comments_readed_by": {
+            "type": "array",
+            "properties": {
+                "#": {
+                    "type": "documentlinkv2",
+                    "displayed": true,
+                    "mainkey": "code",
+                    "url": "_design/s_employee/_list/array/all",
+                    "schema": "employee_schema",
+                    "keys": [],
+                    "properties": {
+                        "doc_id": {
+                            "type": "string",
+                            "default": null,
+                            "required": true,
+                            "show": [
+                                "admin"
+                            ]
+                        },
+                        "value": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "fields": {
+                            "type": "object",
+                            "display": "Additional fields",
+                            "required": true,
+                            "template": "blue"
+                        }
+                    }
+                }
+            }
+        },
+        "comments": {
+            "type": "link",
+            "url": "shares_schema/comments"
+        },
+        "time_track": {
+            "type": "array",
+            "properties": {
+                "#": {
+                    "type": "object",
+                    "properties": {
+                        "who": {
+                            "type": "documentlinkv2",
+                            "required": true,
+                            "mainkey": "name",
+                            "url": "_design/s_employee/_list/array/all",
+                            "schema": "employee_schema",
+                            "keys": [],
+                            "properties": {
+                                "doc_id": {
+                                    "type": "string",
+                                    "default": null,
+                                    "required": true,
+                                    "show": [
+                                        "admin"
+                                    ]
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "required": true
+                                },
+                                "fields": {
+                                    "type": "object",
+                                    "display": "Additionalfields",
+                                    "required": true,
+                                    "template": "blue"
+                                }
+                            }
+                        },
+                        "time_records": {
+                            "type": "array",
+                            "required": true,
+                            "properties": {
+                                "#": {
+                                    "type": "object",
+                                    "properties": {
+                                        "start": {
+                                            "type": "string",
+                                            "required": true
+                                        },
+                                        "end": {
+                                            "type": "string",
+                                            "displayed": true
+                                        },
+                                        "created": {
+                                            "type": "string",
+                                            "required": true,
+                                            "default": "$timestamp"
+                                        },
+                                        "start_modified": {
+                                            "type": "string",
+                                            "displayed": true
+                                        },
+                                        "end_modified": {
+                                            "type": "string",
+                                            "displayed": true
+                                        },
+                                        "modified": {
+                                            "type": "string",
+                                            "displayed": true,
+                                            "default": "$timestamp"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "_id": {
+            "type": "string",
+            "show_roles": [
+                "_admin"
+            ]
+        },
+        "_rev": {
+            "type": "string",
+            "show_roles": [
+                "_admin"
+            ]
+        },
+        "_attachments": {
+            "type": "link",
+            "url": "shares_schema/_attachments"
+        },
+        "changes": {
+            "type": "link",
+            "url": "shares_schema/changes"
+        },
+        "history": {
+            "type": "link",
+            "url": "shares_schema/historyv2"
+        },
+        "type": {
+            "type": "link",
+            "url": "shares_schema/type",
+            "properties": {
+                "#": {
+                    "default": "todo"
+                }
+            }
+        }
+    }
+}

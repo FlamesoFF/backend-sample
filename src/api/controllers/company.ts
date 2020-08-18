@@ -44,12 +44,6 @@ export const companiesController = new class Controller {
         const company = await CouchDbService.adapter.get(id) as ICompany;
         const updateData = CompanyModel.pickUpdateData(body);
 
-
-        company.modified_by = {
-            _id: user._id,
-            name: user.name
-        };
-
         return await CouchDbService.adapter.insert(Object.assign(company, updateData));
     }
 

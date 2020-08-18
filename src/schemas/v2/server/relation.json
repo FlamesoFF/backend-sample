@@ -1,0 +1,25 @@
+{
+    "_id": "relation_2.0.0",
+    "_rev": "1-222170ea4f78888cf826bc340f2db46f",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "relation",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "_id",
+        "class",
+        "type"
+    ]
+}

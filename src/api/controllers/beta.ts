@@ -1,4 +1,4 @@
-import Axios from 'axios';
+import got from 'got';
 import fs from 'fs';
 import path from 'path';
 import jsonwebtoken from 'jsonwebtoken';
@@ -7,6 +7,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { Google } from '../@types/api/beta.types';
 import { Requests } from '../@types/api/controllers.types';
 import { ApiError, ERRORS } from '../errors';
+import { Response } from 'express';
 
 const { web: { client_id, client_secret } }: Google.GapiCredentials = JSON.parse(
     fs.readFileSync(
@@ -55,9 +56,9 @@ export class GoogleController {
             });
 
             const {
-                data: { hd: domain }
-            } = await Axios.get<Google.TokenInfo>(this.oauthTokeninfoUrl, {
-                params: {
+                body: { hd: domain }
+            } = await got.get<Google.TokenInfo>(this.oauthTokeninfoUrl, {
+                searchParams: {
                     id_token: token
                 }
             });
@@ -75,7 +76,7 @@ export class GoogleController {
         return { valid };
     }
 
-    async getGmailMessageById(request: Requests.Beta.GmailMessage): Promise<object> {
+    async getGmailMessageById(request: Requests.Beta.GmailMessage, response: Response): Promise<object> {
         const { oauthToken = '', messageId = '' } = request.body;
         const { email: userId = null } = <Google.TokenInfo>jsonwebtoken.decode(oauthToken) || {};
 

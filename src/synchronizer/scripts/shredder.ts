@@ -1,22 +1,21 @@
-import axios from 'axios';
+import got from 'got';
 import elasticsearch from 'elasticsearch';
 import mysql from 'mysql';
 import { getConfig } from './utils/helper';
 
 const
-    // axios = require('axios'),
     // elasticsearch = require('elasticsearch'),
     util = require('util'),
     config = getConfig(),
     todoApi = config.API.todo,
-    mysqlSetting = config.mysql.apollo,
+    mysqlSetting = config.mysql.main,
     // mysql = require('mysql'),
     mysqlDb = mysql.createPool({
         host: mysqlSetting.host,
         user: mysqlSetting.username,
         password: mysqlSetting.password,
         database: mysqlSetting.database,
-        port: mysqlSetting.port
+        port: mysqlSetting.ports
     }),
     esSetting = config.elasticsearch,
     client = new elasticsearch.Client({
@@ -28,11 +27,11 @@ const
 // @ts-ignore
 mysqlDb.query = util.promisify(mysqlDb.query);
 
-const createTask = async (payload) => {
-    return await axios.post(todoApi, payload);
+const createTask = async ( payload ) => {
+    return await got.post(todoApi, { json: payload });
 };
 
-const updateStatus = async (document) => {
+const updateStatus = async ( document ) => {
     const authority = document.authority || null;
     const certificate = document.company.fields.code.split(':')[1].trim() || null;
     const query = 'update companies_to_shred s set shred_status = \'done\' where s.`authorities.Name`=? and s.Certificate=?';
@@ -40,25 +39,25 @@ const updateStatus = async (document) => {
     await mysqlDb.query(query, [authority, certificate]);
 };
 
-const updateCompanyShredStatus = async (document) => {
+const updateCompanyShredStatus = async ( document ) => {
     const query = 'update companies c set file_status = \'shredded\' where c.guid=?';
     const companyGuid = document.company.doc_id || null;
 
     await mysqlDb.query(query, [companyGuid]);
 };
 
-const getTask = async (payload) => {
+const getTask = async ( payload ) => {
     const query = {
         'bool': {
             'must': [{
                 'match_phrase': {
                     'type': 'shred'
                 }
-            },{
+            }, {
                 'match_phrase': {
-                    'content': payload.content
+                    'content': payload.description
                 }
-            },{
+            }, {
                 'match_phrase': {
                     'company.doc_id': payload.entity_guid
                 }
@@ -76,48 +75,48 @@ const getTask = async (payload) => {
         }
     });
 
-    if (response.hits.hits && response.hits.hits.length) {
+    if ( response.hits.hits && response.hits.hits.length ) {
         return response.hits.hits[0];
     }
 
     return null;
 };
 
-const processDocument = async (document, setting) => {
+const processDocument = async ( document, setting ) => {
     const payload = setting.defaults.payloads.find(p => {
         return p.enable && p.condition(document);
     });
 
-    if (payload) {
-        if (document.company) {
+    if ( payload ) {
+        if ( document.company ) {
             payload.body.entity_guid = document.company.doc_id;
         }
-        if (document.authority) {
+        if ( document.authority ) {
             payload.body.authority = document.authority;
         }
 
         const task = await getTask(payload.body);
 
-        if (!task){
+        if ( !task ) {
             await createTask(payload.body);
         }
     }
-    if (document.completed) {
-        if (document.content === 'Shred file') {
+    if ( document.completed ) {
+        if ( document.description === 'Shred file' ) {
             await updateCompanyShredStatus(document);
         }
-        if (['File to FC', 'Shred file'].includes(document.content) || (document.comments || []).some(c => c.body.trim().toLowerCase() === 'not found')) {
+        if ( ['File to FC', 'Shred file'].includes(document.description) || (document.comments || []).some(c => c.body.trim().toLowerCase() === 'not found') ) {
             await updateStatus(document);
         }
     }
 };
 
 const script = {
-    apply: async (change, setting, params) => {
+    apply: async ( change, setting, params ) => {
         const isDeleted = change.deleted;
         const document = change.doc;
 
-        if (isDeleted) {
+        if ( isDeleted ) {
             //handle delete
         } else {
             await processDocument(document, setting);

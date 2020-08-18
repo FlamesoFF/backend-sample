@@ -1,4 +1,4 @@
-import { IComment, ICountry, IEmail, IQuote } from './definitions.d';
+import { IComment, ICountry, IQuote } from './definitions.d';
 import { IApolloDocument } from '../shared';
 
 
@@ -36,12 +36,11 @@ export interface IPerson extends IApolloDocument {
         initials?: string;
         ip?: string;
         login?: string;
-        email?: IEmail;
+        email?: string
         nationality?: string[];
         structured_name?: IPersonStructuredName;
         type?: TPersonType[];
         notes?: string;
-        // modified_by?: Required<IBasicEntity>;
         comments?: IComment[];
         quotes?: IQuote[];
 }

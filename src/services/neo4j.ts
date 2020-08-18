@@ -28,27 +28,38 @@ export class Neo4jService {
     static adapter: Session;
     private static driver: Driver;
     private static readonly transactions: Promise<any>[] = [];
+    private static url = `${protocol}://${host}:${port}`;
 
     static async connect(initSession?: boolean): Promise<void> {
         try {
-            const url = `${protocol}://${host}:${port}`;
-
             this.driver = neo4j.driver(
-                url,
+                this.url,
                 neo4j.auth.basic(
                     username,
                     password
                 )
             );
 
-            if (initSession) this.newSession();
+            await this.checkConnection();
+
+            if (initSession) this.startSession();
         } catch (error) {
-            console.error('Unable to connect to a Neo4j server: ', error);
+            delete this.driver;
+
+            console.error(`Unable to connect to a Neo4j server at: ${this.url}`, error);
             process.exit(1);
         }
     }
 
-    static async checkConnection() {
+    static async disconnect(initSession?: boolean): Promise<void> {
+        try {
+            await Neo4jService.adapter.close();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    private static async checkConnection() {
         try {
             await this.driver.verifyConnectivity();
 
@@ -59,12 +70,12 @@ export class Neo4jService {
 
             console.log('Connection to Neo4j DB successful!');
         } catch (error) {
-            console.log(`Connectivity verification failed. ${error}`);
+            console.log(`Connectivity verification failed. Unable to connect to ${this.url}`, error);
             process.exit(1);
         }
     }
 
-    static newSession(neo4jSessionParameters?: Neo4jSessionParameters) {
+    static startSession(neo4jSessionParameters?: Neo4jSessionParameters) {
         Neo4jService.adapter = this.driver.session(neo4jSessionParameters);
     }
 
@@ -72,20 +83,27 @@ export class Neo4jService {
         return this.adapter.run(query);
     }
 
-    static async runTransaction(query: string, parameters?: object) {
-        await this.adapter.writeTransaction(tx => tx.run(query, parameters));
+    static async runAtomicParallelTransaction(query: string, parameters?: object) {
+        const session = this.driver.session();
+        const transaction = await session.beginTransaction();
+
+        await transaction.run(query, parameters);
+
+        await transaction.commit();
+
+        await session.close();
     }
 
-    static async runAsyncSession(queries: TransactionQuery[]) {
-        const transaction = this.adapter.beginTransaction();
+    static async bulkQueries(queries: TransactionQuery[]) {
+        // const transaction = this.adapter.beginTransaction();
 
         for (const item of queries) {
             const { query, parameters } = item;
 
-            transaction.run(query, parameters);
+            await this.runAtomicParallelTransaction(query, parameters);
         }
 
-        return transaction.commit();
+        // return;
     }
 }
 

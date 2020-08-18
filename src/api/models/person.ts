@@ -1,8 +1,7 @@
-import { IBasicEntity, ICountry, IEmail, IQuote, IRelation } from '../../@types/data/definitions';
+import { ICountry, IQuote, IRelation } from '../../@types/data/definitions';
 import { IPerson, IPersonStructuredName, TPersonType } from '../../@types/data/person';
 import { IPersonModelParameters } from '../@types/api/models.types';
 import { GenericDocument } from './genericDocument';
-import { MwAuth } from "../middlewares/auth";
 
 
 export class PersonModel extends GenericDocument implements IPerson {
@@ -19,14 +18,13 @@ export class PersonModel extends GenericDocument implements IPerson {
     readonly initials?: string;
     readonly ip?: string;
     readonly login?: string;
-    readonly email?: IEmail;
+    readonly email?: string;
     readonly nationality?: any[];
     readonly comments?: any[];
     readonly structured_name?: IPersonStructuredName;
     readonly type?: TPersonType[];
     readonly quotes?: IQuote[];
     readonly notes?: string;
-    readonly modified_by?: Required<IBasicEntity>;
     readonly relations?: IRelation[];
 
 
@@ -51,16 +49,6 @@ export class PersonModel extends GenericDocument implements IPerson {
 
         this._id = _id;
         this.name = name;
-
-        const {
-            _id: userId,
-            name: userName
-        } = MwAuth.user;
-
-        this.modified_by = {
-            _id: userId,
-            name: userName
-        };
 
         address ? this.address = address : 0;
         country ? this.country = country : 0;

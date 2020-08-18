@@ -3,7 +3,7 @@ import { DocumentInsertResponse, MangoQuery } from 'nano';
 import { CouchDbService } from '../../services/couchDb';
 import { Requests, Responses } from '../@types/api/controllers.types';
 import { ApiError, ERRORS } from '../errors';
-import { FileDetail, FileModel } from '../models/file';
+import { FileDetails, FileModel } from '../models/file';
 import { DEFAULT_LIST_LIMIT, HASH_DIGEST_FORMAT, HASH_MD5_FORMAT, HASH_SHA_FORMAT } from '../constants';
 import { Utils } from '../shared/utils';
 import { commonController } from './common';
@@ -97,7 +97,7 @@ export const filesController = new class Controller {
 
                 FileModel.addFileDetails(
                     fileDocument,
-                    new FileDetail({
+                    new FileDetails({
                         sha,
                         digest,
                         type: mimetype,
@@ -170,7 +170,7 @@ export const filesController = new class Controller {
 
                 FileModel.addFileDetails(
                     document,
-                    new FileDetail({
+                    new FileDetails({
                         sha,
                         digest,
                         type: mimetype,

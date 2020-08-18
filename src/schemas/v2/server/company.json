@@ -1,0 +1,141 @@
+{
+    "_id": "company_2.0.0",
+    "_rev": "18-b6b3dc9b1f5bb1ec330e28bb5427578e",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "company",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "certificate": {
+            "type": "string"
+        },
+        "incorporated_on": {
+            "oneOf": [
+                {
+                    "type": "null"
+                },
+                {
+                    "type": "string"
+                }
+            ]
+        },
+        "client": {
+            "type": "object"
+        },
+        "country": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "code"
+            ]
+        },
+        "address": {
+            "type": "string"
+        },
+        "quotes": {
+            "type": "array",
+            "items": {
+                "$ref": "#quote_2.0.0"
+            }
+        },
+        "type": {
+            "type": "array",
+            "items": [
+                {
+                    "enum": [
+                        "agent",
+                        "authority",
+                        "bank",
+                        "client",
+                        "receiver",
+                        "sender",
+                        "shelf"
+                    ]
+                }
+            ]
+        },
+        "notes": {
+            "type": "string"
+        },
+        "authority": {
+            "type": "object"
+        },
+        "director": {
+            "type": "object"
+        },
+        "shareholder": {
+            "type": "object"
+        },
+        "contact": {
+            "type": "object"
+        },
+        "attorney": {
+            "type": "object"
+        },
+        "secretary": {
+            "type": "object"
+        },
+        "agent": {
+            "type": "object"
+        },
+        "beneficial_owner": {
+            "type": "object"
+        },
+        "capital": {
+            "type": "object"
+        },
+        "dates": {
+            "type": "object"
+        },
+        "mysql": {
+            "type": "object"
+        },
+        "comments": {
+            "type": "array",
+            "items": {
+                "$ref": "#comment_2.0.0"
+            }
+        },
+        "shelf": {
+            "type": "object"
+        },
+        "status": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "schema_id",
+        "class",
+        "name",
+        "country"
+    ],
+    "additionalProperties": false
+}

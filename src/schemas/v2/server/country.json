@@ -1,0 +1,26 @@
+{
+    "_id": "country_2.0.0",
+    "_rev": "1-252793b2f1cbd97f377fcbf1d14f4a35",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "country",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "code": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "id",
+        "name",
+        "code"
+    ],
+    "additionalProperties": false
+}

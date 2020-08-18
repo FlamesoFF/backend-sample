@@ -1,0 +1,57 @@
+{
+    "_id": "receiver_2.0.0",
+    "_rev": "13-ed388d50faf76f7ce4548569cf4de7a4",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "receiver",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "company": {
+            "type": "string"
+        },
+        "country": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string"
+                }
+            }
+        },
+        "address": {
+            "type": "string"
+        },
+        "contact": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "phone"
+            ]
+        }
+    },
+    "required": [
+        "address",
+        "contact"
+    ],
+    "additionalProperties": false
+}

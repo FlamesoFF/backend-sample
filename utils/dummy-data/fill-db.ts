@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { CouchDbService } from '../../src/services/couchDb';
 import { companyGenerator } from './company';
 import { orderGenerator } from './order';
@@ -21,7 +22,7 @@ class DummyData {
     }
 
     static async run() {
-        MwAuth.user = {
+        MwAuth.token = jwt.sign({
             _id: 'tester',
             name: 'Tester',
             initials: 'TE',
@@ -32,7 +33,7 @@ class DummyData {
                 'director',
                 'developer'
             ]
-        };
+        }, MwAuth.secret);
 
         console.log('Generating data...');
 

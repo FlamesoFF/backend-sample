@@ -9,7 +9,7 @@ import { QueryInfo, QueryInfos, QueryNode, QueryRelation } from '../models/query
 import { ICompany } from '../../@types/data/company';
 import { IPerson } from '../../@types/data/person';
 import { IOrder } from '../../@types/data/order';
-import { ITask } from '../../@types/data/task';
+import { Task } from "../../api/modules/tasks/types";
 
 
 export class Neo4jController {
@@ -50,9 +50,9 @@ export class Neo4jController {
             client_reference: (doc: IOrder) => doc.client_reference
         },
         task: {
-            _id: (doc: ITask) => doc._id,
-            content: (doc: ITask) => doc.content,
-            created_on: (doc: ITask) => doc.created_on
+            _id: (doc: Task) => doc._id,
+            content: (doc: Task) => doc.description,
+            created: (doc: Task) => doc.timestamps.created
         }
     }
 
@@ -309,13 +309,13 @@ export class Neo4jController {
         return { query: `MATCH (n {_id: "${id}"}) DETACH DELETE n;` };
     }
 
-    static async executeQueryInfo(queryInfo: QueryNode | QueryRelation) {
-        const query = this.batchifyQuery(queryInfo.query);
-
-        await Neo4jService.runTransaction(query, { batch: queryInfo.params }).catch(error => {
-            syncLogger.logInfo({ message: error });
-        });
-    }
+    // static async executeQueryInfo(queryInfo: QueryNode | QueryRelation) {
+    //     const query = this.batchifyQuery(queryInfo.query);
+    //
+    //     await Neo4jService.runTransaction(query, { batch: queryInfo.params }).catch(error => {
+    //         syncLogger.logInfo({ message: error });
+    //     });
+    // }
 
     static batchifyQuery(query): string {
         return `${Neo4jController.baseQuery}
@@ -340,7 +340,7 @@ export class Neo4jController {
             }
         }
 
-        await Neo4jService.runAsyncSession(queries);
+        await Neo4jService.bulkQueries(queries);
     }
 
 }

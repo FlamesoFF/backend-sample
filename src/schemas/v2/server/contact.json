@@ -1,0 +1,35 @@
+{
+    "_id": "contact_2.0.0",
+    "_rev": "4-e8da9c045ee4c43791e7f15dca43838c",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "contact",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "email": {
+            "type": "string"
+        },
+        "initials": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "type",
+        "name",
+        "email"
+    ],
+    "additionalProperties": false
+}

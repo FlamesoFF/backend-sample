@@ -1,3 +1,4 @@
+import nconf from 'nconf';
 import nano, { DatabaseChangesResultItem } from 'nano';
 import { CouchDbService } from '../services/couchDb';
 import { syncLogger } from '../service-logger';
@@ -16,62 +17,62 @@ import { CONFIG } from '../shared/config';
 
 class Synchronizer {
     private feeds: {
-        apollo: nano.FollowEmitter
+        main: nano.FollowEmitter
         tasks: nano.FollowEmitter
     } = {
-        apollo: undefined,
+        main: undefined,
         tasks: undefined
     };
 
 
-    static async run() {
+    static async run(): Promise<void> {
         const synchronizer = new this();
+
+        const { init } = nconf.argv().load();
+
+        if (!init) console.warn(
+            `Synchronizer is running without initialization. To run with initialization use "--init" flag.`
+        );
 
         try {
             const { name: taskDbName } = CONFIG.servers.couchdb.databases?.tasks || {};
 
-            await synchronizer.initialize();
+            await synchronizer.initializeConnections();
 
-            synchronizer.feeds.apollo.follow();
-            if (taskDbName) synchronizer.feeds.tasks.follow();
+            // Re-sync
+            if (args().init) {
+                await this.reSync();
+            }
         } catch (error) {
             syncLogger.logError({ message: error.message, data: error });
         }
     }
 
-    private async initialize() {
-        syncLogger.logInfo({ message: 'Initializing ...' });
-
-        await this.initializeFeeds();
-
-
+    private async initializeConnections() {
         syncLogger.logInfo({ message: 'Connecting to the servers...' });
+        console.log('Synchronizer');
 
         await CouchDbService.connect();
         await PostgreSqlService.connect();
         await Neo4jService.connect();
-        await Neo4jService.checkConnection();
 
-        // Re-sync
-        if (args().init) {
-            syncLogger.logInfo({ message: 'Fetching CouchDB documents to index ...' });
-
-            const docs = await CouchDbController.fetchAllDocuments([
-                'person',
-                'company',
-                'order',
-                'task'
-            ]);
-
-            await Synchronizer.reSync(docs);
-        }
+        syncLogger.logInfo({ message: 'Initializing feeds...' });
+        await this.initializeFeeds();
 
         this.setListeners();
 
         syncLogger.logInfo({ message: 'Initialization finished.' });
     }
 
-    private static async reSync(docs: ApolloDocument[]) {
+    private static async reSync() {
+        syncLogger.logInfo({ message: 'Re-syncing databases...' });
+
+        const docs: ApolloDocument[] = await CouchDbController.fetchAllDocuments([
+            'person',
+            'company',
+            'order',
+            'task'
+        ]);
 
         await Neo4jController.purge();
         await EntitiesController.purge();
@@ -109,20 +110,18 @@ class Synchronizer {
         const { name: mainDbName } = CONFIG.servers.couchdb.databases.main;
         const { name: tasksDbName } = CONFIG.servers.couchdb.databases?.tasks || {};
 
-        await CouchDbService.connect();
         CouchDbService.switchDb(mainDbName);
 
-        this.feeds.apollo = CouchDbService.adapter.follow({
+        this.feeds.main = CouchDbService.adapter.follow({
             since: 'now',
-            // since: 1200850,
             include_docs: true
         });
 
         if (CONFIG.servers.couchdb.databases.tasks) {
             CouchDbService.switchDb(tasksDbName);
+
             this.feeds.tasks = CouchDbService.adapter.follow({
                 since: 'now',
-                // since: 1200850,
                 include_docs: true
             });
         }
@@ -133,22 +132,35 @@ class Synchronizer {
         const { name: mainDbName } = CONFIG.servers.couchdb.databases.main;
         const tasksDbName = CONFIG.servers.couchdb.databases?.tasks?.name;
 
-        this.feeds.apollo.on('change', async (change: DatabaseChangesResultItem) => {
-            syncLogger.logInfo({ message: 'Change: apollo', data: change });
+        this.feeds.main.on('change', async (change: DatabaseChangesResultItem) => {
+            syncLogger.logInfo({ message: `Change: ${mainDbName}`, data: change });
+            console.log(`Change: ${mainDbName}`);
 
             await ChangeController.sync(mainDbName, change);
         });
 
+        this.feeds.main.follow();
+
         if (tasksDbName) {
             this.feeds.tasks.on('change', async (change: DatabaseChangesResultItem) => {
-                syncLogger.logInfo({ message: 'Change: tasks', data: change });
+                syncLogger.logInfo({ message: `Change: ${tasksDbName}`, data: change });
+                console.log(`Change: ${tasksDbName}`);
 
                 await ChangeController.sync(tasksDbName, change);
             });
+
+            this.feeds.tasks.follow();
         }
     }
 }
 
-Synchronizer.run().catch(error => {
-    syncLogger.logError({ data: error });
-});
+// Convert to module.
+process
+    .on('uncaughtException', error => {
+        syncLogger.logError({ data: error });
+    })
+    .on('beforeExit', error => {
+        console.log('Synchronizer was stopped.');
+    });
+
+export default Synchronizer.run();

@@ -27,12 +27,6 @@ export const personsController = new class Controller {
         try {
             const person = await CouchDbService.adapter.get(id) as IPerson;
 
-            /*
-             * person.modified_by = {
-             *     _id: user._id,
-             *     name: user.name
-             * };
-             */
             return await CouchDbService.adapter.insert(Object.assign(person, details));
         } catch (error) {
             throw error;

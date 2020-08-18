@@ -1,0 +1,104 @@
+{
+    "_id": "supporting_document_2.0.0",
+    "_rev": "9-c169639b437737632ecba92463841c09",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "document",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        },
+        "issued_by": {
+            "type": "string"
+        },
+        "number": {
+            "type": "string"
+        },
+        "issued_on": {
+            "type": "string"
+        },
+        "entered_on": {
+            "type": "string"
+        },
+        "valid_till": {
+            "type": "string"
+        },
+        "status": {
+            "type": "string"
+        },
+        "verification": {
+            "type": "string"
+        },
+        "comment": {
+            "type": "string"
+        },
+        "entity": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "dob": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "_id",
+                "name",
+                "class",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "entered_by": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "_id",
+                "name"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "schema_id",
+        "class",
+        "entered_by",
+        "entity",
+        "type"
+    ],
+    "additionalProperties": false
+}

@@ -31,7 +31,8 @@
                 "person",
                 "company",
                 "order",
-                "document"
+                "document",
+                "task"
             ]
         }
     }

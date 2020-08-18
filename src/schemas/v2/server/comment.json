@@ -1,0 +1,44 @@
+{
+    "_id": "comment_2.0.0",
+    "_rev": "3-7fcda0f8ec368877a045d9057e2e10b7",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "comment",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "user": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "avatar": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "name"
+            ]
+        },
+        "text": {
+            "type": "string"
+        },
+        "created_on": {
+            "type": "string"
+        },
+        "updated_on": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "user",
+        "text",
+        "created_on"
+    ],
+    "additionalProperties": false
+}

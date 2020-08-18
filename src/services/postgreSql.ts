@@ -1,6 +1,5 @@
 import { Client, Pool } from 'pg';
 import { CONFIG } from '../shared/config';
-import { Sequelize } from 'sequelize';
 
 
 const {
@@ -17,7 +16,6 @@ const {
 export class PostgreSqlService {
     static adapter: Client;
     static poolAdapter: Pool;
-    static builder: Sequelize = new Sequelize({ dialect: 'postgres' });
 
     static async connect(dbName?: string): Promise<boolean> {
         PostgreSqlService.adapter = new Client({
@@ -28,18 +26,18 @@ export class PostgreSqlService {
             password
         });
 
-        const onError = error => {
-            throw new Error('Unable to connect to a PostgreSQL server: ' + error);
-            process.exit(1);
-        };
+        try {
+            await PostgreSqlService.adapter.connect();
+        } catch (error) {
+            this.onError(error);
+        }
 
-        await PostgreSqlService.adapter.connect()
-            .catch(onError);
-
-
-        await PostgreSqlService.adapter
-            .query('SELECT $1::text as message', ['Hello world!'])
-            .catch(onError);
+        try {
+            await PostgreSqlService.adapter
+                .query('SELECT $1::text as message', ['Hello world!']);
+        } catch (error) {
+            this.onError(error);
+        }
 
         console.log('Connected to a PostgreSQL server.');
 
@@ -52,6 +50,11 @@ export class PostgreSqlService {
     }
 
 
+    private static onError(error) {
+        console.error(`Unable to connect to a PostgreSQL server at: ${host}:${port};`, error);
+        process.exit(1);
+    }
+
     static async connectPool(): Promise<boolean> {
         PostgreSqlService.poolAdapter = new Pool({
             user,
@@ -61,9 +64,6 @@ export class PostgreSqlService {
             database: mainDbName
         });
 
-        const onError = error => {
-            throw new Error('Unable to connect to a PostgreSQL server: ' + error);
-        };
 
         try {
             await PostgreSqlService.adapter.connect();
@@ -73,19 +73,23 @@ export class PostgreSqlService {
                 console.log('Disconnected from Postgres server.');
             });
         } catch (error) {
-            onError(error);
+            this.onError(error);
         }
 
         try {
             await PostgreSqlService.adapter.query('SELECT NOW() as now');
             console.log('Connected to a PostgreSQL server.');
         } catch (error) {
-            onError(error);
+            this.onError(error);
         }
 
         return true;
     }
 
+
+    static async disconnect(): Promise<void> {
+        return await PostgreSqlService.adapter.end();
+    }
 
     static async disconnectPool(): Promise<void> {
         return await PostgreSqlService.poolAdapter.end();

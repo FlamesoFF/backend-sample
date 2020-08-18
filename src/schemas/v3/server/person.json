@@ -44,27 +44,6 @@
                 "John Doe"
             ]
         },
-        "modified_by": {
-            "type": "object",
-            "required": [
-                "_id",
-                "name"
-            ],
-            "properties": {
-                "_id": {
-                    "type": "string",
-                    "examples": [
-                        "tester"
-                    ]
-                },
-                "name": {
-                    "type": "string",
-                    "examples": [
-                        "Tester"
-                    ]
-                }
-            }
-        },
         "address": {
             "type": "string",
             "examples": [

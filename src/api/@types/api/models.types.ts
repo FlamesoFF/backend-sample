@@ -1,6 +1,6 @@
 import { ICompany, TCompanyType } from '../../../@types/data/company';
 import { ICourier } from '../../../@types/data/courier';
-import { IBasicEntity, IComment, ICountry, IEmail, IQuote } from '../../../@types/data/definitions';
+import { IComment, ICountry, IQuote } from '../../../@types/data/definitions';
 import { IFileDetails, IFileDocument } from '../../../@types/data/file';
 import { IPerson, IPersonStructuredName, TPersonType } from '../../../@types/data/person';
 import { QuoteModel } from '../../models/shared/quote';
@@ -13,8 +13,7 @@ export type TExcludeCommon =
     | '_attachments'
     | 'class'
     | 'schema_id'
-    | 'relations'
-    | 'modified_by';
+    | 'relations';
 
 export type TExcludeUpdate =
     '_id'
@@ -95,11 +94,10 @@ export interface IPersonModelParameters extends BasicParameters {
     initials?: string;
     ip?: string;
     login?: string;
-    email?: IEmail;
+    email?: string
     nationality?: string[];
     structured_name?: IPersonStructuredName;
     notes?: string;
-    modified_by?: Required<IBasicEntity>;
     comments?: IComment[];
     quotes?: IQuote[];
 }

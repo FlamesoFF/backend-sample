@@ -7,6 +7,7 @@ export interface Configuration {
 
     auth: Auth
     API: API
+    environment?: string
 }
 
 interface Server {
@@ -29,7 +30,10 @@ interface DB {
 
 interface API {
     lists: Lists
-    port: number
+    ports: {
+        private: number
+        public: number
+    }
 }
 
 interface Lists {

@@ -1,0 +1,114 @@
+type Task {
+    _id: String!
+    type: [String]
+    description: String
+    created_on: String
+    completed_on: String
+    remind_on: String
+    notes: String
+    estimated_time: Int
+    assigned_by: INode
+    assigned_to: INode
+    related_to: INode
+    comments: [Comment]
+    files: [FileDetails]
+}
+
+interface INode {
+    _id: String
+    class: String
+    name: String
+    description: String
+}
+
+type TaskTimestamps {
+    created: Int
+    reminder: Int
+    completed: Int
+}
+
+type TimeTrack {
+    time_records: [TimeRecord]
+    who: BasicEntity
+}
+
+type TimeRecord{
+    start: Int
+    end: Int
+    created: Int
+}
+
+
+type CommentUser {
+    _id: String
+    name: String
+    avatar: String!
+}
+
+type Comment {
+    user: CommentUser
+    text: String
+    created_on: String
+    updated_on: String!
+}
+
+type BasicEntity {
+    _id: String!
+    name: String!
+}
+
+type FileDetails {
+    sha: String
+    digest: String
+    type: String
+    created_on: Int
+    created_by: BasicEntity
+
+    description: String!
+}
+
+type IQuoteHeaders {
+    to: String
+    subject: String
+    message_id: String
+    from: String
+    date: String
+    thread_id: String!
+}
+
+type QuoteItem {
+    manager_id: String
+    text: String
+}
+
+type Quote {
+    headers: IQuoteHeaders
+    items: [QuoteItem]
+}
+
+type CreateTaskPayload {
+    description: String
+    notes: String
+    reminder_time: String
+    comments: [Comment]
+    files: [FileDetails]
+    quotes: [Quote]
+}
+
+type CouchDbResponse {
+    ok: Boolean!
+    id: ID
+}
+
+type Query {
+    list(
+        group: String = "to_me"
+        limit: Int = 20
+    ): [Task]
+
+    search(
+        description: String
+        group: String = "to_me"
+        limit: Int = 20
+    ): [Task]
+}

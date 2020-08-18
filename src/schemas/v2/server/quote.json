@@ -1,0 +1,53 @@
+{
+    "_id": "quote_2.0.0",
+    "_rev": "4-4a6288d892a40848e93e36525f1ffc36",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "quote",
+    "version": "2.0.1",
+    "type": "object",
+    "properties": {
+        "headers": {
+            "type": "object",
+            "properties": {
+                "to": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "message_id": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "thread_id": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "to",
+                "subject",
+                "message_id",
+                "from",
+                "date"
+            ]
+        },
+        "items": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object"
+                }
+            ]
+        }
+    },
+    "required": [
+        "headers",
+        "items"
+    ]
+}

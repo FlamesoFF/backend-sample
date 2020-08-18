@@ -1,5 +1,7 @@
+import { ValidationError } from 'ajv';
 import { Request } from 'express';
 import { ParamsDictionary, Query } from 'express-serve-static-core';
+import { QueryResultRow } from 'pg';
 import { Multipart } from 'request';
 import { Stream } from 'stream';
 import { ICompany } from '../../../@types/data/company';
@@ -7,11 +9,9 @@ import { ICourier } from '../../../@types/data/courier';
 import { ICountry, INode } from '../../../@types/data/definitions';
 import { IFileDocument } from '../../../@types/data/file';
 import { IPerson } from '../../../@types/data/person';
-import { TExcludeCommon } from './models.types';
-import { ITask } from '../../../@types/data/task';
-import { QueryResultRow } from 'pg';
 import { NodeAmbiguous, Relation, TRelation, TRelationMeta } from '../../../@types/types';
-import { ValidationError } from 'ajv';
+import { TExcludeCommon } from './models.types';
+import { Task, TaskPayload } from '../../modules/tasks/types';
 
 
 export namespace Requests {
@@ -262,6 +262,7 @@ export namespace Requests {
                 order_direction?: 'desc' | 'asc'
                 manager_id?: string
                 my_orders?: string
+                limit?: string
             }
         }
 
@@ -288,7 +289,7 @@ export namespace Requests {
             thread_ids?: string[]
         }
 
-        interface PgSqlBasicPayload {
+        export interface IPgSqlBasicPayload {
             contact_email?: string
             order_status?: string
             compliance_status?: string
@@ -297,15 +298,28 @@ export namespace Requests {
             client_reference?: string
             date?: string
             tags?: string[]
-            company_ids?: string[]
+            company_id?: string
             companies?: string[]
             client_id?: string
             quotes?: string[]
+            comments?: string[]
             thread_ids?: string[]
         }
 
-        export interface ICreateWithPgSQL extends Request {
-            body: PgSqlBasicPayload
+        export interface IPgSQLCreate extends Request {
+            body: IPgSqlBasicPayload
+        }
+
+        export interface IPgSQLUpdate extends Request {
+            params: ParamsId
+            body: IPgSqlBasicPayload
+        }
+
+        export interface IPgSQLBindThread extends Request {
+            params: ParamsId
+            body: {
+                thread_ids: string[]
+            }
         }
 
         export interface ICreate extends Request {
@@ -314,18 +328,6 @@ export namespace Requests {
 
         export interface IUpdate extends Request {
             body: IUpdateBody
-        }
-
-        export interface IUpdateWithPgSQL extends Request {
-            params: ParamsId
-            body: PgSqlBasicPayload
-        }
-
-        export interface IBindThread extends Request {
-            params: ParamsId
-            body: {
-                thread_ids: string[]
-            }
         }
     }
 
@@ -428,11 +430,10 @@ export namespace Requests {
             | 'completed';
 
 
-        export interface ISearch extends Request {
-            query: Query & {
-                content: string
-                group?: TGroups
-            } & QueryLimited
+        export interface ISearch  {
+            description: string
+            group?: TGroups
+            limit: number
         }
 
         /*
@@ -446,18 +447,19 @@ export namespace Requests {
 
         export interface IUpdate extends Request {
             params: ParamsId
-            body: Pick<ITask,
-                'content'
-                // | 'completed_on'
-                | 'type'>
+            body: TaskPayload
         }
 
         // ISO 8601
         export interface IComplete extends Request {
             params: ParamsId
             body: {
-                datetime: string
+                timestamp: string   // unix timestamp
             }
+        }
+
+        export interface ICreate {
+            body: TaskPayload
         }
 
     }
@@ -521,7 +523,7 @@ export namespace Responses {
     export namespace Lists {
 
         export interface DefaultItem {
-            _id: string
+            _id?: string
             class: string
         }
 
@@ -562,12 +564,11 @@ export namespace Responses {
         }
 
 
-        export type Generic = Default | Order | Task;
+        export type Generic = Default | Order | Task[];
 
         export type Default = DefaultItem[];
         export type Companies = (CompanyItem & {})[]
         export type Order = (OrderItem & {})[]
-        export type Task = (TaskItem & {})[]
     }
 
     export namespace Common {

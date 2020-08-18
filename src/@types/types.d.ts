@@ -5,7 +5,8 @@ import { IOrder } from './data/order';
 import { ICourier } from './data/courier';
 import { IFileDocument } from './data/file';
 import { FinancialDocument } from './data/document';
-import { ITask } from './data/task';
+import { TaskPayload } from '../api/modules/tasks/model';
+import { Task } from "../api/modules/tasks/types";
 
 export type Entity = IPerson | ICompany;
 // All possible relation types
@@ -61,6 +62,8 @@ export type RelationDefined = IRelation<INode>;
 export type RelationAbstract = IRelation<INodeAbstract>;
 export type RelationDefinedMeta = IRelationReversed<INode>;
 export type RelationList<T extends NodeAmbiguous = NodeAmbiguous> = Relation<T>[];
+
+
 /**
  * TYPES
  */
@@ -72,7 +75,7 @@ export type ApolloDocument =
     | ICourier
     | IFileDocument
     | FinancialDocument
-    | ITask;
+    | Task;
 
 export type IndexedSignature<T extends any = any> = {
     [key: string]: T

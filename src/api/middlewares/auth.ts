@@ -1,23 +1,25 @@
+import jwt from 'jsonwebtoken';
+import statuses from 'statuses';
+import fs from 'fs';
+import path from 'path';
+import got from 'got';
 import { NextFunction, Request, Response } from 'express';
 import { CONFIG } from '../../shared/config';
-import jwt from 'jsonwebtoken';
 import { IUser } from '../../@types/data/definitions';
-import statuses from 'statuses';
 import { ApiError, ERRORS } from '../errors';
 import { OAuth2Client } from 'google-auth-library';
 import { Google } from '../@types/api/beta.types';
-import fs from 'fs';
-import path from 'path';
 import { promisify } from 'util';
 import { CouchDbService } from '../../services/couchDb';
 import { IPerson } from '../../@types/data/person';
-import { ApolloJwtToken, GoogleJwtToken } from '../@types/auth/definitions';
 import { TextUtils } from '@apollo4u/auxiliary';
+import { ApolloJwtToken, GoogleJwtToken, IXeroConnection, IXeroToken } from './types';
 
 
 enum AuthFormats {
     Bearer = 'Bearer',
-    Google = 'Google'
+    Google = 'Google',
+    Xero = 'Xero'
 }
 
 enum DomainsWhiteList {
@@ -33,8 +35,17 @@ interface AuthUserData {
 }
 
 export abstract class MwAuth {
-    static user: AuthUserData;
-    private static secret = CONFIG.auth.secret;
+    private static userData: AuthUserData;
+    static secret = CONFIG.auth.secret;
+
+
+    static get user() {
+        return this.userData;
+    }
+
+    static set token( token: string ) {
+        this.userData = jwt.decode(token) as AuthUserData;
+    }
 
 
     static get authorizationGate() {
@@ -43,75 +54,122 @@ export abstract class MwAuth {
             response: Response,
             next: NextFunction
         ) => {
+            let result = false;
             const { authorization } = request.headers;
 
-            if (!authorization) this.send(new ApiError(ERRORS.AUTH.MISSING_AUTH_HEADER), response, next);
+            // Check authorization header
+            if ( !authorization ) return next(new ApiError(ERRORS.AUTH.MISSING_AUTH_HEADER));
 
             const [, type, token] = authorization.match(/(Bearer|Google) (.+)/i);
 
-            if (!(type in AuthFormats)) this.send(new ApiError(ERRORS.AUTH.UNKNOWN_AUTHORIZATION_TYPE), response, next);
+            // Check auth formats
+            if ( !(type in AuthFormats) ) return next(new ApiError(ERRORS.AUTH.UNKNOWN_AUTHORIZATION_TYPE));
 
-            let result = false;
 
+            try {
+                switch ( type ) {
+                    case AuthFormats.Bearer:
+                        result = await this.processApolloToken(token);
+                        break;
 
-            if (type === AuthFormats.Google) {
-                result = await this.checkGoogleToken(token);
+                    case AuthFormats.Google:
+                        result = await this.processGoogleToken(token);
+                        break;
 
-                const {
-                    _id,
-                    name,
-                    email: { value: email } = {},
-                    initials = TextUtils.nameToInitials(name)
-                } = await this.checkGoogleUserRegistered(token);
+                    case AuthFormats.Xero:
+                        result = await this.processXeroToken(token);
+                        break;
 
-                MwAuth.user = {
-                    _id,
-                    name,
-                    initials,
-                    email: email ?? `${_id}@apollo4u.net`,
-                    roles: ['manager']  // TODO: get roles from PGSQL table "managers"
-                };
-            }
-            else if (type === AuthFormats.Bearer) {
-                try {
-                    result = await this.checkApolloAuth(token);
-                } catch (error) {
-                    throw new ApiError(ERRORS.AUTH.INVALID_TOKEN, error.message);
+                    default:
+                        return next(new ApiError(ERRORS.AUTH.INVALID_TOKEN));
                 }
-
-                const {
-                    _id,
-                    name,
-                    initials,
-                    email,
-                    roles
-                } = this.parseToken(token) as ApolloJwtToken;
-
-                MwAuth.user = {
-                    _id,
-                    name,
-                    initials,
-                    email: email || `${_id}@apollo4u.net`,
-                    roles
-                };
+            } catch ( error ) {
+                response.status(statuses('Unauthorized'));
+                next(new ApiError(ERRORS.AUTH.INVALID_TOKEN, error.message));
             }
-
-            if (!result) this.send(new ApiError(ERRORS.AUTH.INVALID_TOKEN), response, next);
-
 
             response.set('Access-Control-Expose-Headers', 'Content-Disposition');
-
             next();
         };
     }
 
 
-    private static send(error: ApiError, response: Response, next: NextFunction) {
-        response.status(statuses('Unauthorized')).send(error);
-        throw error;
+    private static async processApolloToken( token: string ): Promise<boolean> {
+        let result = !!this.validateApolloToken(token);
+
+        const {
+            _id,
+            name,
+            initials,
+            email,
+            roles
+        } = this.parseToken<ApolloJwtToken>(token);
+
+        MwAuth.token = jwt.sign({
+            _id,
+            name,
+            initials,
+            email: email || `${ _id }@apollo4u.net`,
+            roles
+        }, MwAuth.secret);
+
+        return result;
     }
 
-    private static async checkGoogleToken(token: string): Promise<boolean> {
+    private static async processGoogleToken( token ) {
+        const result: boolean = await this.validateGoogleToken(token);
+
+        if ( !result ) return false;
+
+        const {
+            _id,
+            name,
+            email,
+            initials = TextUtils.nameToInitials(name)
+        } = await this.checkGoogleUserRegistered(token);
+
+        MwAuth.token = jwt.sign({
+            _id,
+            name,
+            initials,
+            email: email ?? `${ _id }@apollo4u.net`,
+            roles: ['manager']  // TODO: get roles from PGSQL table "managers"
+        }, MwAuth.secret);
+
+        return result;
+    }
+
+    private static async processXeroToken( token: string ): Promise<boolean> {
+        const result = await this.validateXeroToken(token);
+
+        if ( !result ) return false;
+
+        const {
+            given_name,
+            family_name,
+            email
+        } = await this.parseToken<IXeroToken>(token);
+
+        const initials = TextUtils.nameToInitials(`${ given_name } ${ family_name }`);
+        const id = email.match(/^(.)@/i)?.[1];
+
+        MwAuth.token = jwt.sign({
+            _id: id,
+            name: given_name,
+            initials,
+            email,
+            roles: ['manager']
+        }, MwAuth.secret);
+
+        return result;
+    }
+
+    // private static send(error: ApiError, response: Response, next: NextFunction) {
+    //     response.status(statuses('Unauthorized')).send(error);
+    //     throw error;
+    // }
+
+    private static async validateGoogleToken( token: string ): Promise<boolean> {
         /*  Verification START  */
         let ticket;
         const { web: { client_id, client_secret } }: Google.GapiCredentials = JSON.parse(
@@ -127,46 +185,53 @@ export abstract class MwAuth {
                 idToken: token,
                 // audience: client_id
             });
-        } catch (error) {
+        } catch ( error ) {
             throw new ApiError(ERRORS.AUTH.INVALID_TOKEN, error.message);
         }
 
         const { hd: domain } = ticket.getPayload();
 
-        if (!(domain in DomainsWhiteList)) throw new ApiError(ERRORS.AUTH.DOMAIN_UNRECOGNIZED);
+        if ( !(domain in DomainsWhiteList) ) throw new ApiError(ERRORS.AUTH.DOMAIN_UNRECOGNIZED);
 
         return true;
     }
 
-    private static checkApolloAuth(token: string): boolean {
-        return !!this.verifyToken(token);
-    }
-
-    private static verifyToken(token: string): IUser {
+    private static validateApolloToken( token: string ): IUser {
         return <IUser>jwt.verify(token, this.secret);
     }
 
-    private static parseToken(token: string): ApolloJwtToken | GoogleJwtToken {
-        // @ts-ignore
+    private static parseToken<R extends ApolloJwtToken | GoogleJwtToken | IXeroToken>( token: string ): R {
         const { payload } = jwt.decode(token, {
             json: true,
             complete: true
         });
 
-        return payload;
+        return <R>payload;
     }
 
-    private static async checkGoogleUserRegistered(token: string): Promise<IPerson> {
-        const { email } = this.parseToken(token) as GoogleJwtToken;
+    private static async checkGoogleUserRegistered( token: string ): Promise<IPerson> {
+        const { email } = this.parseToken<GoogleJwtToken>(token);
         const id = email.match(/(.+)@/i)?.[1];
-        const {name} = CONFIG.servers.couchdb.databases.main;
+        const { name } = CONFIG.servers.couchdb.databases.main;
 
         try {
             CouchDbService.switchDb(name);
 
             return await CouchDbService.adapter.get(id) as IPerson;
-        } catch (e) {
+        } catch ( e ) {
             throw new ApiError(ERRORS.AUTH.USER_IS_NOT_REGISTERED);
         }
+    }
+
+    private static async validateXeroToken( token: string ): Promise<boolean> {
+        const { body: [{ tenantId }] = [] } = await got.get<IXeroConnection[]>('https://api.xero.com/connections', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${ token }`
+            },
+            responseType: 'json'
+        });
+
+        return !!tenantId;
     }
 }

@@ -7,7 +7,9 @@ services:
     ports:
       - "3033:3033"
       - "3034:3034"
+    image: aka4u/apollo4u:api
   synchronizer:
     build:
       context: .
       target: Synchronizer
+    image: aka4u/apollo4u:synchronizer

@@ -1,0 +1,624 @@
+{
+    "_id": "company_v1",
+    "name": "company",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Name of company",
+            "required": true,
+            "logged": true
+        },
+        "code": {
+            "type": "string",
+            "description": "Short name of company",
+            "required": true,
+            "logged": true
+        },
+        "emails": {
+            "type": "link",
+            "url": "shares_schema/emails"
+        },
+        "address": {
+            "type": "string"
+        },
+        "phones": {
+            "type": "link",
+            "url": "shares_schema/phones"
+        },
+        "faxes": {
+            "type": "link",
+            "url": "shares_schema/faxes"
+        },
+        "contacts": {
+            "type": "link",
+            "url": "shares_schema/contacts"
+        },
+        "addresses": {
+            "type": "object",
+            "displayed": true,
+            "properties": {
+                "Reg_office": {
+                    "type": "string",
+                    "display": "Registered office"
+                },
+                "Book_of_account": {
+                    "type": "string",
+                    "display": "Books of Accounts"
+                },
+                "*": {
+                    "type": "string",
+                    "description": "type of address",
+                    "key_instruction": "Enter type of address"
+                }
+            }
+        },
+        "client": {
+            "type": "documentlinkv2",
+            "displayed": true,
+            "mainkey": "code",
+            "url": "_design/s_client/_list/array/all",
+            "schema": "client_schema",
+            "keys": [],
+            "properties": {
+                "doc_id": {
+                    "type": "string",
+                    "default": null,
+                    "required": true,
+                    "show": [
+                        "admin"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "required": true
+                },
+                "fields": {
+                    "type": "object",
+                    "display": "Additional fields",
+                    "required": true,
+                    "template": "blue"
+                }
+            }
+        },
+        "agent": {
+            "type": "documentlinkv2",
+            "required": true,
+            "mainkey": "code",
+            "url": "_design/s_agent/_list/array/all",
+            "schema": "agent_schema",
+            "keys": [],
+            "properties": {
+                "doc_id": {
+                    "type": "string",
+                    "default": null,
+                    "required": true,
+                    "show": [
+                        "admin"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "required": true
+                },
+                "fields": {
+                    "type": "object",
+                    "display": "Additional fields",
+                    "required": true,
+                    "template": "blue"
+                }
+            }
+        },
+        "authority": {
+            "type": "documentlinkv2",
+            "required": true,
+            "mainkey": "code",
+            "url": "_design/s_authority/_list/array/all",
+            "schema": "authority_schema",
+            "keys": [],
+            "properties": {
+                "doc_id": {
+                    "type": "string",
+                    "default": null,
+                    "required": true,
+                    "show": [
+                        "admin"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "required": true
+                },
+                "fields": {
+                    "type": "object",
+                    "display": "Additional fields",
+                    "required": true,
+                    "template": "blue"
+                }
+            }
+        },
+        "type": {
+            "type": "link",
+            "url": "shares_schema/type",
+            "properties": {
+                "#": {
+                    "default": "company"
+                }
+            }
+        },
+        "changes": {
+            "type": "link",
+            "url": "shares_schema/changes"
+        },
+        "notes": {
+            "type": "string",
+            "logged": true
+        },
+        "object": {
+            "type": "string",
+            "description": "",
+            "show": [
+                "admin"
+            ]
+        },
+        "mysql": {
+            "type": "object",
+            "show": [
+                "admin"
+            ],
+            "properties": {
+                "company_id": {
+                    "type": "number",
+                    "logged": true
+                },
+                "authority_id": {
+                    "type": "number",
+                    "logged": true
+                },
+                "agent_id": {
+                    "type": "number",
+                    "logged": true
+                },
+                "client_id": {
+                    "type": "number",
+                    "logged": true
+                },
+                "original_id": {
+                    "type": "number",
+                    "logged": true
+                }
+            }
+        },
+        "certificate": {
+            "type": "string",
+            "logged": true
+        },
+        "incorporated": {
+            "type": "date",
+            "regexp": "^\\d\\d\\d\\d-\\d\\d-\\d\\d$",
+            "instruction": "Format of date must be YYYY-MM-DD (ex. 2001-01-01)",
+            "show": [
+                "admin",
+                "manager"
+            ],
+            "logged": true
+        },
+        "capital": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "link",
+                    "url": "shares_schema/currency",
+                    "instruction": "Value must be a positive number",
+                    "logged": true
+                },
+                "shares": {
+                    "type": "array",
+                    "properties": {
+                        "#": {
+                            "type": "object",
+                            "properties": {
+                                "class": {
+                                    "type": "string"
+                                },
+                                "qty": {
+                                    "type": "number"
+                                },
+                                "paid": {
+                                    "type": "number"
+                                },
+                                "unpaid": {
+                                    "type": "number"
+                                },
+                                "nominal": {
+                                    "type": "number"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "currency": {
+            "type": "link",
+            "url": "shares_schema/currency/currency",
+            "logged": true
+        },
+        "shares": {
+            "type": "number",
+            "description": "shares",
+            "show": [
+                "admin",
+                "manager"
+            ],
+            "logged": true
+        },
+        "status": {
+            "type": "string",
+            "display": "status is",
+            "show": [
+                "admin",
+                "manager"
+            ],
+            "logged": true
+        },
+        "country": {
+            "type": "link",
+            "url": "shares_schema/country",
+            "required": true
+        },
+        "dates": {
+            "type": "object",
+            "properties": {
+                "renewal": {
+                    "type": "date",
+                    "regexp": "^\\d\\d\\d\\d-\\d\\d-\\d\\d$",
+                    "instruction": "Format of date must be YYYY-MM-DD (ex. 2001-01-01)"
+                }
+            }
+        },
+        "renewals": {
+            "type": "array",
+            "tostring": [
+                "$0"
+            ],
+            "show": [
+                "admin",
+                "manager"
+            ],
+            "properties": {
+                "#": {
+                    "type": "object",
+                    "tostring": [
+                        "agent:",
+                        "$agent",
+                        ", manager:",
+                        "$manager",
+                        ", status:",
+                        "$status",
+                        ", bill:",
+                        "$bill",
+                        ", invoice:",
+                        "$invoice",
+                        ", renewal:",
+                        "$renewal"
+                    ],
+                    "show": [
+                        "admin",
+                        "manager"
+                    ],
+                    "description": "record of renewal",
+                    "properties": {
+                        "agent": {
+                            "type": "documentlinkv2",
+                            "mainkey": "code",
+                            "url": "_design/s_agent/_list/array/all",
+                            "schema": "client_schema",
+                            "keys": [],
+                            "properties": {
+                                "doc_id": {
+                                    "type": "string",
+                                    "default": null,
+                                    "required": true,
+                                    "show": [
+                                        "admin"
+                                    ]
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "required": true
+                                },
+                                "fields": {
+                                    "type": "object",
+                                    "display": "Additional fields",
+                                    "required": true,
+                                    "template": "blue"
+                                }
+                            }
+                        },
+                        "manager": {
+                            "type": "documentlinkv2",
+                            "required": true,
+                            "mainkey": "code",
+                            "url": "_design/s_person/_list/array/all",
+                            "schema": "person_schema",
+                            "keys": [],
+                            "properties": {
+                                "doc_id": {
+                                    "type": "string",
+                                    "default": null,
+                                    "required": true,
+                                    "show": [
+                                        "admin"
+                                    ]
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "required": true
+                                },
+                                "fields": {
+                                    "type": "object",
+                                    "display": "Additional fields",
+                                    "required": true,
+                                    "template": "blue"
+                                }
+                            }
+                        },
+                        "status": {
+                            "type": "list",
+                            "default": "none",
+                            "show": [
+                                "admin",
+                                "manager"
+                            ],
+                            "items": {
+                                "none": {
+                                    "description": ""
+                                },
+                                "new": {
+                                    "description": ""
+                                },
+                                "processing": {
+                                    "description": ""
+                                },
+                                "done": {
+                                    "description": "is done"
+                                }
+                            }
+                        },
+                        "bill": {
+                            "type": "documentlinkv2",
+                            "required": true,
+                            "mainkey": "name",
+                            "url": "_design/s_invoice/_list/array/all",
+                            "schema": "invoice_schema",
+                            "keys": [],
+                            "properties": {
+                                "doc_id": {
+                                    "type": "string",
+                                    "default": null,
+                                    "required": true,
+                                    "show": [
+                                        "admin"
+                                    ]
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "required": true
+                                },
+                                "fields": {
+                                    "type": "object",
+                                    "display": "Additional fields",
+                                    "required": true,
+                                    "template": "blue"
+                                }
+                            }
+                        },
+                        "invoice": {
+                            "type": "documentlinkv2",
+                            "required": true,
+                            "mainkey": "name",
+                            "url": "_design/s_invoice/_list/array/all",
+                            "schema": "invoice_schema",
+                            "keys": [],
+                            "properties": {
+                                "doc_id": {
+                                    "type": "string",
+                                    "default": null,
+                                    "required": true,
+                                    "show": [
+                                        "admin"
+                                    ]
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "required": true
+                                },
+                                "fields": {
+                                    "type": "object",
+                                    "display": "Additional fields",
+                                    "required": true,
+                                    "template": "blue"
+                                }
+                            }
+                        },
+                        "renewal": {
+                            "type": "string",
+                            "required": true,
+                            "show": [
+                                "admin",
+                                "manager"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "officers": {
+            "type": "object",
+            "properties": {
+                "members": {
+                    "type": "array",
+                    "tostring": [
+                        "$self_value"
+                    ],
+                    "properties": {
+                        "#": {
+                            "type": "object",
+                            "tostring": [
+                                "$name"
+                            ],
+                            "properties": {
+                                "shares": {
+                                    "type": "array",
+                                    "properties": {
+                                        "#": {
+                                            "type": "object",
+                                            "properties": {
+                                                "class": {
+                                                    "type": "string"
+                                                },
+                                                "qty": {
+                                                    "type": "number"
+                                                },
+                                                "paid": {
+                                                    "type": "number"
+                                                },
+                                                "unpaid": {
+                                                    "type": "number"
+                                                },
+                                                "nominal": {
+                                                    "type": "number"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "name": {
+                                    "type": "documentlinkv2",
+                                    "mainkey": "code",
+                                    "url": "_design/s_person/_list/array/all",
+                                    "schema": "person_schema",
+                                    "keys": [
+                                        {
+                                            "key": "address"
+                                        },
+                                        {
+                                            "key": "description"
+                                        }
+                                    ],
+                                    "properties": {
+                                        "doc_id": {
+                                            "type": "string",
+                                            "default": null,
+                                            "required": true,
+                                            "show": [
+                                                "admin"
+                                            ]
+                                        },
+                                        "value": {
+                                            "type": "string",
+                                            "required": true
+                                        },
+                                        "fields": {
+                                            "type": "object",
+                                            "display": "Additional fields",
+                                            "required": true,
+                                            "template": "blue"
+                                        }
+                                    }
+                                },
+                                "issued": {
+                                    "type": "date"
+                                },
+                                "cancelled": {
+                                    "type": "date"
+                                },
+                                "notes": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "directors": {
+                    "type": "array",
+                    "tostring": [
+                        "$self_value"
+                    ],
+                    "properties": {
+                        "#": {
+                            "type": "object",
+                            "tostring": [
+                                "$name"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "documentlinkv2",
+                                    "mainkey": "code",
+                                    "url": "_design/s_person/_list/array/all",
+                                    "schema": "person_schema",
+                                    "keys": [
+                                        {
+                                            "key": "address"
+                                        }
+                                    ],
+                                    "properties": {
+                                        "doc_id": {
+                                            "type": "string",
+                                            "default": null,
+                                            "required": true,
+                                            "show": [
+                                                "admin"
+                                            ]
+                                        },
+                                        "value": {
+                                            "type": "string",
+                                            "required": true
+                                        },
+                                        "fields": {
+                                            "type": "object",
+                                            "display": "Additional fields",
+                                            "required": true,
+                                            "template": "blue"
+                                        }
+                                    }
+                                },
+                                "started": {
+                                    "type": "date"
+                                },
+                                "resigned": {
+                                    "type": "date"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "offices": {
+            "type": "link",
+            "url": "shares_schema/offices"
+        },
+        "_id": {
+            "type": "string",
+            "show": [
+                "admin"
+            ]
+        },
+        "_rev": {
+            "type": "string",
+            "show": [
+                "admin"
+            ]
+        },
+        "category": {
+            "type": "link",
+            "url": "shares_schema/category"
+        },
+        "history": {
+            "type": "link",
+            "url": "shares_schema/historyv2"
+        }
+    }
+}

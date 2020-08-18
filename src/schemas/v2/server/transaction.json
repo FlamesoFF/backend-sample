@@ -1,0 +1,196 @@
+{
+    "_id": "transaction_2.0.0",
+    "_rev": "15-9e2cc2fb8a6ccc896ebdc8297aa9dc2c",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "transaction",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "entered_on": {
+            "type": "string"
+        },
+        "account": {
+            "type": "string"
+        },
+        "date": {
+            "type": "string"
+        },
+        "currency": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string"
+        },
+        "value": {
+            "type": "string"
+        },
+        "status": {
+            "type": "string"
+        },
+        "details": {
+            "type": "string"
+        },
+        "comment": {
+            "type": "string"
+        },
+        "entity": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "country": {
+                    "$ref": "#country_2.0.0"
+                }
+            },
+            "required": [
+                "_id",
+                "name",
+                "class",
+                "country"
+            ],
+            "additionalProperties": false
+        },
+        "bank": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "string"
+                },
+                "country": {
+                    "$ref": "#country_2.0.0"
+                }
+            },
+            "required": [
+                "_id",
+                "name",
+                "class",
+                "country"
+            ],
+            "additionalProperties": false
+        },
+        "entered_by": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "_id",
+                "name"
+            ],
+            "additionalProperties": false
+        },
+        "counterparty": {
+            "type": "object",
+            "properties": {
+                "entity": {
+                    "type": "object",
+                    "properties": {
+                        "_id": {
+                            "type": "string"
+                        },
+                        "class": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "country": {
+                            "$ref": "#country_2.0.0"
+                        }
+                    },
+                    "required": [
+                        "_id",
+                        "class",
+                        "name",
+                        "country"
+                    ],
+                    "additionalProperties": false
+                },
+                "bank": {
+                    "type": "object",
+                    "properties": {
+                        "_id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "class": {
+                            "type": "string"
+                        },
+                        "country": {
+                            "$ref": "#country_2.0.0"
+                        }
+                    },
+                    "required": [
+                        "_id",
+                        "name",
+                        "class",
+                        "country"
+                    ],
+                    "additionalProperties": false
+                },
+                "account": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "entity"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "schema_id",
+        "class",
+        "entered_by",
+        "entity",
+        "bank",
+        "account",
+        "date",
+        "value",
+        "currency",
+        "type"
+    ],
+    "additionalProperties": false
+}

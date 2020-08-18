@@ -14,11 +14,6 @@ export interface ICompany extends IApolloDocument {
         [k: string]: any
     };
     country: ICountry
-    modified_by?: {
-        _id: string
-        name: string
-        [k: string]: any
-    }
 }
 
 
@@ -35,7 +30,6 @@ export interface ICompany extends IApolloDocument {
  *     offices?: string[]
  *     status?: string
  *     authority?: ICompanyAuthority
- *     modified_by?: Required<IBasicEntity>
  *     client_status?: string;
  *     company_status?: string;
  *     struck_off_on?: string;

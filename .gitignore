@@ -1,11 +1,14 @@
-/.idea
-/.vscode
+.idea
+.vscode
 /node_modules
 /dist
+/coverage
 /logs
 /tests/temp/**/*
 
 config.json
-config-*.json
+config.*.json
 yarn-error.log
 docker
+/.nyc_output/
+/test-reports

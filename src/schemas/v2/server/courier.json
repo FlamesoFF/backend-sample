@@ -1,0 +1,122 @@
+{
+    "_id": "courier_2.0.0",
+    "_rev": "34-308a236cf687b94be8fff61b686d6344",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "courier",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "number": {
+            "type": "string"
+        },
+        "sender": {
+            "type": "string"
+        },
+        "name": {
+            "enum": [
+                "DHL",
+                "FedEx",
+                "TNT",
+                "UPS"
+            ]
+        },
+        "status": {
+            "type": "object",
+            "properties": {
+                "delivered": {
+                    "type": "boolean"
+                },
+                "dispatched": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dates": {
+            "type": "object",
+            "properties": {
+                "created_on": {
+                    "type": "string",
+                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                },
+                "expected_dispatch": {
+                    "type": "string",
+                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+                }
+            }
+        },
+        "relations": {
+            "type": "array",
+            "items": [
+                {
+                    "anyOf": [
+                        {
+                            "$ref": "#sender_2.0.0"
+                        },
+                        {
+                            "$ref": "#receiver_2.0.0"
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "_id": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "class": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "_id": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "email": {
+                                    "type": "string"
+                                },
+                                "initials": {
+                                    "type": "string"
+                                },
+                                "class": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "required": [
+        "schema_id",
+        "number",
+        "class",
+        "name"
+    ]
+}

@@ -1,24 +1,25 @@
-import { DocumentFetchResponse, MangoQuery, SortOrder } from 'nano';
-import { ICompany } from '../../@types/data/company';
-import { IRelation } from '../../@types/data/definitions';
-import { IOrder } from '../../@types/data/order';
-import { IPerson } from '../../@types/data/person';
-import { Requests, Responses } from '../@types/api/controllers.types';
-import { ApiError, ERRORS } from '../errors';
-import { OrderModel } from '../models/order';
-import { CouchDbService } from '../../services/couchDb';
-import { Neo4jService } from '../../services/neo4j';
-import { Utils } from '../shared/utils';
-import { MwAuth } from '../middlewares/auth';
-import { DEFAULT_LIST_LIMIT, ORDER_DATE_PATTERN } from '../constants';
-import { SCHEMA_PATHS, validator } from '../services/validator';
-import { TextUtils } from '@apollo4u/auxiliary';
-import { StatsController } from './stats';
+import {TextUtils} from '@apollo4u/auxiliary';
 import moment from 'moment';
-import { PostgreSqlService } from '../../services/postgreSql';
-import { ResponseFormatterData } from '../middlewares/response';
-import { QueryResult } from 'pg';
-import { CONFIG } from '../../shared/config';
+import {DocumentFetchResponse, MangoQuery, SortOrder} from 'nano';
+import {QueryResult} from 'pg';
+import {ICompany} from '../../@types/data/company';
+import {IRelation} from '../../@types/data/definitions';
+import {IOrder} from '../../@types/data/order';
+import {IPerson} from '../../@types/data/person';
+import {CouchDbService} from '../../services/couchDb';
+import {Neo4jService} from '../../services/neo4j';
+import {PostgreSqlService} from '../../services/postgreSql';
+import {CONFIG} from '../../shared/config';
+import {Requests, Responses} from '../@types/api/controllers.types';
+import {DEFAULT_LIST_LIMIT, ORDER_DATE_PATTERN} from '../constants';
+import {ApiError, ERRORS} from '../errors';
+import {MwAuth} from '../middlewares/auth';
+import {OrderModel} from '../models/order';
+import {SCHEMA_PATHS, validator} from '../services/validator';
+import {Utils} from '../shared/utils';
+import {OrdersUtils} from '../utils/orders';
+import {StatsController} from './stats';
+import { ResponseFormatterData } from "../middlewares/types";
 
 
 type Client = ICompany | IPerson;
@@ -28,6 +29,11 @@ export interface PgSqlOrderResponse {
 }
 
 export interface PgSqlOrderResponseItem {
+    client_id?: string;
+    contact_email?: string;
+    company_id?: string;
+    client_reference?: string;
+    thread_id?: string[];
     order_id: string;
     manager_id: string;
     order_status: string;
@@ -36,15 +42,25 @@ export interface PgSqlOrderResponseItem {
     client_status: string;
     order_date: string;
     tags: string[];
-    company_id: null;
-    client_reference: null;
     stamp: string;
-    client_id: string;
-    contact_email: string;
-    quotes: string[];
-    companies: string[];
+    data: {
+        [key: string]: any
+    }
 
     [key: string]: any
+}
+
+
+interface FormBasicQueryParams
+    extends Exclude<Requests.Orders.IPgSqlBasicPayload,
+        'companies' | 'quotes' | 'comments'> {
+    manager_id: string
+    order_id?: string
+    data?: {
+        companies?: string[]
+        quotes?: string[]
+        comments?: string[]
+    };
 }
 
 
@@ -57,11 +73,10 @@ export interface PgSqlOrderUpdateParameters {
     p_thread_id?: string[]
 }
 
-
 export class OrdersController {
 
     static async initialize() {
-        const { main: { name: mainDbName } } = CONFIG.servers.couchdb.databases;
+        const {main: {name: mainDbName}} = CONFIG.servers.couchdb.databases;
 
         CouchDbService.switchDb(mainDbName);
 
@@ -103,7 +118,7 @@ export class OrdersController {
             }
         } = request;
 
-        const { roles: userRoles } = MwAuth.user;
+        const {roles: userRoles} = MwAuth.user;
 
 
         async function ordersListMap(doc: IOrder): Promise<Responses.Lists.OrderItem> {
@@ -159,25 +174,24 @@ export class OrdersController {
                 `MATCH (o:order)-[:managed_by]-({_id: "${manager_id.trim()}"})
                 RETURN o`;
 
-            const { records } = await Neo4jService.adapter.run(neoQuery);
+            const {records} = await Neo4jService.adapter.run(neoQuery);
 
             const keys: string[] =
                 records.map(item => {
                     const {
-                        properties: { _id = null } = {}
+                        properties: {_id = null} = {}
                     } = item.get('o');
 
                     return _id;
                 });
 
-            const response = await CouchDbService.adapter.fetch({ keys }) as DocumentFetchResponse<IOrder>;
+            const response = await CouchDbService.adapter.fetch({keys}) as DocumentFetchResponse<IOrder>;
 
             documents = Utils.Nano.normalizeResponse(response);
-        }
-        else {
+        } else {
             const query: MangoQuery = {
                 selector: {
-                    class: { $eq: 'order' }
+                    class: {$eq: 'order'}
                 },
                 limit: Number(limit)
             };
@@ -197,7 +211,7 @@ export class OrdersController {
                     throw new ApiError(ERRORS.COUCH_DB.INVALID_ORDER_DIRECTION);
                 }
 
-                query.sort = [<SortOrder>{ [order_by]: order_direction }];
+                query.sort = [<SortOrder>{[order_by]: order_direction}];
             }
 
             const response = await CouchDbService.adapter.find(query);
@@ -222,7 +236,7 @@ export class OrdersController {
 
 
     static async create(request: Requests.Orders.ICreate) {
-        const { _id: user_id } = MwAuth.user;
+        const {_id: user_id} = MwAuth.user;
         const {
             client_id,
             date,
@@ -233,7 +247,7 @@ export class OrdersController {
             companies
         } = request.body;
 
-        let { client_reference } = request.body;
+        let {client_reference} = request.body;
         let manager: IPerson,
             client: Client;
 
@@ -247,13 +261,13 @@ export class OrdersController {
         try {
             manager = await CouchDbService.adapter.get(manager_id) as IPerson;
         } catch (error) {
-            throw new ApiError({ description: `Manager with ID "${manager_id}" was not found.` });
+            throw new ApiError({description: `Manager with ID "${manager_id}" was not found.`});
         }
 
         try {
             client = await CouchDbService.adapter.get(client_id) as Client;
         } catch (error) {
-            throw new ApiError({ description: `Client with ID "${client_id}" was not found.` });
+            throw new ApiError({description: `Client with ID "${client_id}" was not found.`});
         }
 
 
@@ -269,7 +283,7 @@ export class OrdersController {
         const number = await StatsController.incrementOrderNumber();
 
         // Create initials name
-        const { name } = MwAuth.user;
+        const {name} = MwAuth.user;
         const initials = TextUtils.nameToInitials(name);
 
 
@@ -292,28 +306,7 @@ export class OrdersController {
     }
 }
 
-interface FormBasicQueryParams {
-    manager_id: string
-    order_id?: string
-    data?: {
-        companies?: string[]
-        quotes?: string[]
-    };
-    client_id?: string;
-    contact_id?: string;
-    date?: string;
-    contact_email?: string;
-    accounts_status?: string;
-    client_status?: string;
-    client_reference?: string
-    compliance_status?: string;
-    order_status?: string;
-    company_ids?: string[];
-    thread_ids?: string[];
-    tags?: string[];
-}
-
-export class OrdersPgSQLController {
+export class OrdersPgSQLController extends OrdersUtils {
 
     static async search({
         query: {
@@ -322,13 +315,14 @@ export class OrdersPgSQLController {
             order_by = 'order_date',
             order_direction = 'desc',
             manager_id,
-            my_orders
+            my_orders,
+            limit
         }
     }: Requests.Orders.ISearchWithPgSQL): Promise<PgSqlOrderResponseItem[]> {
-        const { _id: userId } = MwAuth.user;
+        const {_id: userId} = MwAuth.user;
 
-        let queryParams = '';
-        let threadParameter,
+        let queryParams = '',
+            threadParameter,
             statusesParameter;
 
         if (manager_id || my_orders === 'true') queryParams += `p_manager_id:='${manager_id ?? userId}',`;
@@ -336,37 +330,28 @@ export class OrdersPgSQLController {
         if (statuses) statusesParameter = `ARRAY[${statuses.split(',').map(item => `'${item}'`).join(',')}]::TEXT[]`;
 
         queryParams += `p_status:=${statusesParameter || null}`;
-        queryParams += `,p_thread_id:=${threadParameter || null}`;
+        queryParams += `,p_thread_ids:=${threadParameter || null}`;
 
-        let query = `SELECT * FROM find_orders(${queryParams})`;
+        let query = `SELECT * FROM find_orders_2(${queryParams})`;
 
         if (order_by) query += ` ORDER BY ${order_by}`;
         if (order_by && order_direction) query += ` ${order_direction}`;
 
-        query += ' LIMIT 100';
+        query += ` LIMIT ${limit || DEFAULT_LIST_LIMIT}`;
 
-        const { rows } = await PostgreSqlService.adapter.query(query) as PgSqlOrderResponse;
+        const {rows} = await PostgreSqlService.adapter.query(query) as PgSqlOrderResponse;
 
         return this.formatOrderList(rows) ?? [];
     }
 
-    static async getById({ params: { id } }: Requests.Common.IGetSpecific) {
+    static async getById({params: {id}}: Requests.Common.IGetSpecific) {
         const queryOrder =
-            `SELECT *
-            FROM (
-                 SELECT *
-                 FROM orders
-                 WHERE order_id = '${id}'
-            ) o
-                LEFT OUTER JOIN
-            (
-                 SELECT *
-                 FROM threads
-                 WHERE order_id = '${id}'
-             ) AS t
-             ON o.order_id = t.order_id;`;
+            `SELECT o.*, t.thread_id
+            FROM orders o LEFT OUTER JOIN threads t
+            ON o.order_id = t.order_id
+            WHERE o.order_id = '${id}'`;
 
-        const { rows } = await PostgreSqlService.adapter.query(queryOrder) as QueryResult<PgSqlOrderResponseItem>;
+        const {rows} = await PostgreSqlService.adapter.query(queryOrder) as QueryResult<PgSqlOrderResponseItem>;
 
         if (rows.length === 0) throw new ApiError(ERRORS.PG.NOT_FOUND_BY_ID);
 
@@ -378,8 +363,8 @@ export class OrdersPgSQLController {
         delete order.thread_id;
 
         return {
-            ...order,
-            ...{ thread_ids: threads }
+            ...this.formatOrder(order),
+            ...{thread_ids: threads}
         };
     }
 
@@ -393,20 +378,22 @@ export class OrdersPgSQLController {
             client_id,
             contact_email,
             client_reference,
-            company_ids = [],
+            company_id,
             companies = [],
             quotes = [],
             tags = [],
-            thread_ids = []
+            thread_ids = [],
+            comments = []
         }
-    }: Requests.Orders.ICreateWithPgSQL): Promise<ResponseFormatterData> {
-        const { _id: manager_id } = MwAuth.user;
+    }: Requests.Orders.IPgSQLCreate): Promise<ResponseFormatterData> {
+        const {_id: manager_id} = MwAuth.user;
+
         let contact_id: string;
 
         if (contact_email && !client_id) {
             ({
-                client: { _id: client_id },
-                contact: { _id: contact_id }
+                client: {_id: client_id},
+                contact: {_id: contact_email}
             } = await this.getClientIdByEmail(contact_email));
         }
 
@@ -420,14 +407,14 @@ export class OrdersPgSQLController {
 
         const data = {
             quotes,
-            companies
+            companies,
+            comments
         };
 
         const queryParams = this.formBasicQuery({
             manager_id,
             data,
             client_id,
-            contact_id,
             date,
             contact_email,
             accounts_status,
@@ -435,20 +422,20 @@ export class OrdersPgSQLController {
             client_reference,
             compliance_status,
             order_status,
-            company_ids,
+            company_id,
             thread_ids,
-            tags
+            tags,
+            comments
         });
 
         const query = `CALL add_order(${queryParams})`;
 
         try {
-            const { rows: [{ p_order_id }] } = await PostgreSqlService.adapter.query(query);
+            const {rows: [{p_order_id}]} = await PostgreSqlService.adapter.query(query);
 
             if (p_order_id) {
-                return { id: p_order_id };
-            }
-            else {
+                return {id: p_order_id};
+            } else {
                 throw 'Unable to create order. PgSQL internal error.';
             }
         } catch (e) {
@@ -466,21 +453,22 @@ export class OrdersPgSQLController {
             client_id,
             compliance_status,
             order_status,
-            company_ids = [],
+            company_id,
             companies = [],
             thread_ids = [],
             quotes = [],
-            tags = []
+            tags = [],
+            comments = []
         },
-        params: { id: order_id }
-    }: Requests.Orders.IUpdateWithPgSQL): Promise<ResponseFormatterData> {
-        const { _id: managerId } = MwAuth.user;
+        params: {id: order_id}
+    }: Requests.Orders.IPgSQLUpdate): Promise<ResponseFormatterData> {
+        const {_id: manager_id} = MwAuth.user;
         let contact_id: string;
 
         if (contact_email && !client_id) {
             ({
-                client: { _id: client_id },
-                contact: { _id: contact_id }
+                client: {_id: client_id},
+                contact: {_id: contact_email}
             } = await this.getClientIdByEmail(contact_email));
         }
 
@@ -495,15 +483,15 @@ export class OrdersPgSQLController {
 
         const data = {
             quotes,
-            companies
+            companies,
+            comments
         };
 
         const queryParams = this.formBasicQuery({
-            manager_id: managerId,
+            manager_id,
             order_id,
             data,
             client_id,
-            contact_id,
             date,
             contact_email,
             accounts_status,
@@ -511,7 +499,7 @@ export class OrdersPgSQLController {
             client_status,
             compliance_status,
             order_status,
-            company_ids,
+            company_id,
             thread_ids,
             tags
         });
@@ -519,12 +507,11 @@ export class OrdersPgSQLController {
         const query = `CALL upd_order(${queryParams})`;
 
         try {
-            const { rows: [{ p_order_id }] } = await PostgreSqlService.adapter.query(query);
+            const {rows: [{p_order_id}]} = await PostgreSqlService.adapter.query(query);
 
             if (p_order_id) {
-                return { id: p_order_id };
-            }
-            else {
+                return {id: p_order_id};
+            } else {
                 throw 'Unable to update order. PgSQL internal error.';
             }
         } catch (e) {
@@ -534,9 +521,9 @@ export class OrdersPgSQLController {
     }
 
     static async bindThreads({
-        body: { thread_ids },
-        params: { id: orderId }
-    }: Requests.Orders.IBindThread): Promise<ResponseFormatterData> {
+        body: {thread_ids},
+        params: {id: orderId}
+    }: Requests.Orders.IPgSQLBindThread): Promise<ResponseFormatterData> {
         if (!thread_ids) throw new ApiError(ERRORS.COMMON.MISSING_REQUIRED_PARAMETERS, ['thread_ids']);
 
         const threadParameter = thread_ids.map(item => `'${item}'`).join(',');
@@ -545,27 +532,10 @@ export class OrdersPgSQLController {
         try {
             await PostgreSqlService.adapter.query(query);
 
-            return { id: orderId };
+            return {id: orderId};
         } catch (e) {
             throw 'Unable to bind threads to order.';
         }
-    }
-
-    private static formatOrderList(rows: PgSqlOrderResponseItem[]) {
-        return rows.map(row => {
-            if (row.data) {
-                for (const [key, value] of Object.entries(row.data)) {
-                    row[key] = value;
-                }
-            }
-
-            delete row.data;
-
-            // Format date
-            row.order_date = moment(row?.order_date ?? new Date()).format(ORDER_DATE_PATTERN);
-
-            return row;
-        });
     }
 
     private static async getClientIdByEmail(contact_email: string) {
@@ -587,7 +557,6 @@ export class OrdersPgSQLController {
         order_id,
         data,
         client_id,
-        contact_id,
         date,
         contact_email,
         accounts_status,
@@ -595,9 +564,10 @@ export class OrdersPgSQLController {
         client_reference,
         compliance_status,
         order_status,
-        company_ids,
+        company_id,
         thread_ids,
-        tags
+        tags,
+        comments
     }: FormBasicQueryParams): string {
         let query = `p_manager_id:='${manager_id}'`;
 
@@ -608,7 +578,6 @@ export class OrdersPgSQLController {
         // Primitive types
         if (order_id) query += `,p_order_id:='${order_id}'`;
         if (client_id) query += `,p_client_id:='${client_id}'`;
-        if (contact_id) query += `,p_contact_id:='${contact_id}'`;
         if (contact_email) query += `,p_contact_email:='${contact_email}'`;
         if (order_date) query += `,p_order_date:='${order_date}'`;
         if (accounts_status) query += `,p_accounts_status:='${accounts_status}'`;
@@ -616,12 +585,8 @@ export class OrdersPgSQLController {
         if (client_reference) query += `,p_client_reference:='${client_reference}'`;
         if (compliance_status) query += `,p_compliance_status:='${compliance_status}'`;
         if (order_status) query += `,p_order_status:='${order_status}'`;
+        if (company_id) query += `,p_company_id:='${company_id}'`;
 
-        if (company_ids) {
-            const subQuery = company_ids.map(item => `'${item}'`).join(',');
-
-            query += `,p_company_id:=ARRAY[${subQuery}]::TEXT[]`;
-        }
         if (thread_ids) {
             const subQuery = thread_ids.map(item => `'${item}'`).join(',');
 

@@ -2,8 +2,7 @@ import { TextUtils } from '@apollo4u/auxiliary';
 import moment, { Moment } from 'moment';
 import { ICourierModelParameters } from '../@types/api/models.types';
 import { ICourier } from '../../@types/data/courier';
-import { IBasicEntity, IRelation } from '../../@types/data/definitions';
-import { MwAuth } from '../middlewares/auth';
+import { IRelation } from '../../@types/data/definitions';
 import { NodeAmbiguous } from '../../@types/types';
 
 
@@ -19,7 +18,6 @@ export class CourierModel implements ICourier {
 
     readonly _id?: string;
     readonly relations?: IRelation<NodeAmbiguous>[] = [];
-    readonly modified_by?: Required<IBasicEntity>;
 
 
     constructor({
@@ -34,10 +32,6 @@ export class CourierModel implements ICourier {
         number
     }: ICourierModelParameters) {
         const currentDate = moment();
-        const {
-            _id: userId,
-            name: userName
-        } = MwAuth.user;
 
 
         _id ? this._id = _id : 0;
@@ -53,11 +47,6 @@ export class CourierModel implements ICourier {
             this.number = CourierModel.generateNumber(TextUtils.nameToInitials(name), currentDate);
 
         this.sent_on = currentDate.format('YYYY-MM-DD');
-
-        this.modified_by = {
-            _id: userId,
-            name: userName
-        };
 
 
         // if (threadId) {

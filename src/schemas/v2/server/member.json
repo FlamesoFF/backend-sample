@@ -1,0 +1,81 @@
+{
+    "_id": "member_2.0.0",
+    "_rev": "1-ca2c5681fe6e8e2354c8504690897a52",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "member",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "type": {
+            "enum": [
+                "is_member"
+            ]
+        },
+        "credential": {
+            "type": "object",
+            "properties": {
+                "accepted": {
+                    "type": "boolean"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "password_scheme": {
+                    "type": "string"
+                },
+                "registered_on": {
+                    "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "salt": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "login": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "accepted",
+                "password",
+                "password_scheme",
+                "registered_on",
+                "roles",
+                "salt",
+                "status",
+                "name",
+                "login",
+                "email"
+            ]
+        }
+    },
+    "required": [
+        "_id",
+        "class",
+        "name",
+        "type",
+        "credential"
+    ]
+}

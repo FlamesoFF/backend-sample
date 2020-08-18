@@ -21,6 +21,10 @@ export namespace DummyData {
             return moment(faker.date.past()).format('YYYY-MM-DD');
         }
 
+        export function randomTaskDate(): number {
+            return moment(faker.date.past()).unix();
+        }
+
         export function randomDateISO(): string {
             return moment(faker.date.past()).toISOString();
         }
@@ -32,6 +36,13 @@ export namespace DummyData {
                 yield faker.random.uuid();
             }
         }
+
+        /*
+         * export function* randomStrings(count: number): Generator<string> {
+         *     while (count--)
+         *         yield faker.lorem.words();
+         * }
+         */
     }
 
     export namespace Strings {

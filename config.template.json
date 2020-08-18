@@ -1,56 +1,60 @@
 {
-  "servers": {
-    "pgsql": {
-      "protocol": "http",
-      "host": "localhost",
-      "port": 5432,
-      "username": "",
-      "password": "",
-      "databases": {
-        "main": {
-          "name": "",
-          "similarity": 0.1
-        }
-      }
-    },
-    "couchdb": {
-      "protocol": "http",
-      "host": "localhost",
-      "port": 5984,
-      "username": "",
-      "password": "",
-      "databases": {
-        "main": {
-          "name": ""
+    "servers": {
+        "pgsql": {
+            "protocol": "http",
+            "host": "localhost",
+            "port": 5432,
+            "username": "",
+            "password": "",
+            "databases": {
+                "main": {
+                    "name": "",
+                    "similarity": 0.1
+                }
+            }
         },
-        "tasks": {
-          "name": ""
+        "couchdb": {
+            "protocol": "http",
+            "host": "localhost",
+            "port": 5984,
+            "username": "",
+            "password": "",
+            "databases": {
+                "main": {
+                    "name": ""
+                },
+                "tasks": {
+                    "name": ""
+                },
+                "files": {
+                    "name": ""
+                }
+            }
         },
-        "files": {
-          "name": ""
+        "neo4j": {
+            "protocol": "bolt",
+            "host": "localhost",
+            "port": 7687,
+            "username": "",
+            "password": "",
+            "databases": {
+                "main": {
+                    "name": ""
+                }
+            }
         }
-      }
     },
-    "neo4j": {
-      "protocol": "bolt",
-      "host": "localhost",
-      "port": 7687,
-      "username": "",
-      "password": "",
-      "databases": {
-        "main": {
-          "name": ""
+    "auth": {
+        "secret": "1234567890"
+    },
+    "API": {
+        "lists": {
+            "limit": 10
+        },
+        "ports": {
+            "private": 3033,
+            "public": 3034
         }
-      }
-    }
-  },
-  "auth": {
-    "secret": "1234567890"
-  },
-  "API": {
-    "lists": {
-      "limit": 10
     },
-    "port": 3033
-  }
+    "environment": "docker"
 }

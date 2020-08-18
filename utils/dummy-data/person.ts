@@ -14,9 +14,7 @@ export function* personGenerator(number: number): Generator<IPerson> {
             country: DummyData.Basic.randomCountry(),
             country_of_birth: faker.address.country(),
             date_of_birth: DummyData.Dates.randomDate(),
-            email: {
-                value: faker.internet.email()
-            },
+            email: faker.internet.email(),
             initials: randexp(/[A-Z]{2}/),
             nationality: [faker.address.country()],
             occupation: faker.random.arrayElement(['driver', 'doctor', 'teacher', 'scientist', 'accountant', 'banker']),

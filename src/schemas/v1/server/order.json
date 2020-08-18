@@ -1,0 +1,847 @@
+{
+    "_id": "order_v1",
+    "$id": "order_v1",
+    "name": "order",
+    "type": "object",
+    "commented": true,
+    "reports": [
+        "email"
+    ],
+    "documents": [
+        "document"
+    ],
+    "properties": {
+        "number": {
+            "type": "string",
+            "required": true,
+            "readonly": true
+        },
+        "email_id": {
+            "type": "link",
+            "url": "shares_schema/email_id"
+        },
+        "client": {
+            "type": "documentlinkv2",
+            "required": true,
+            "mainkey": "name",
+            "url": "_design/s_client/_list/array/all",
+            "schema": "client_schema",
+            "keys": [
+                {
+                    "key": "address",
+                    "schema": {
+                        "required": false,
+                        "displayed": true
+                    }
+                },
+                {
+                    "key": "emails",
+                    "schema": {
+                        "required": false,
+                        "displayed": true
+                    }
+                }
+            ],
+            "properties": {
+                "doc_id": {
+                    "type": "string",
+                    "default": null,
+                    "required": true,
+                    "show": [
+                        "admin"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "required": true
+                },
+                "fields": {
+                    "type": "object",
+                    "display": "Additional fields",
+                    "required": true,
+                    "template": "blue",
+                    "properties": {
+                        "address": {
+                            "type": "string",
+                            "required": false,
+                            "template": "checkedit"
+                        }
+                    }
+                }
+            }
+        },
+        "client_reference": {
+            "type": "string",
+            "display": "client reference",
+            "size": 1,
+            "required": true
+        },
+        "manager": {
+            "type": "documentlinkv2",
+            "required": true,
+            "mainkey": "code",
+            "url": "_design/s_employee/_list/array/all",
+            "schema": "employee_schema",
+            "keys": [
+                {
+                    "key": "emails"
+                },
+                {
+                    "key": "initial"
+                }
+            ],
+            "properties": {
+                "doc_id": {
+                    "type": "string",
+                    "default": null,
+                    "required": true,
+                    "show": [
+                        "admin"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "required": true
+                },
+                "fields": {
+                    "type": "object",
+                    "display": "Additional fields",
+                    "required": true,
+                    "template": "blue"
+                }
+            }
+        },
+        "description": {
+            "type": "string",
+            "displayed": true
+        },
+        "proposed_names": {
+            "type": "array",
+            "properties": {
+                "#": {
+                    "type": "string"
+                }
+            }
+        },
+        "prerequisite": {
+            "type": "object",
+            "displayed": true,
+            "properties": {
+                "tags": {
+                    "type": "array",
+                    "properties": {
+                        "#": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "names_for_approval": {
+                    "type": "array",
+                    "properties": {
+                        "#": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "authority": {
+                    "type": "documentlinkv2",
+                    "required": true,
+                    "mainkey": "code",
+                    "url": "_design/s_authority/_list/array/all",
+                    "schema": "authority_schema",
+                    "keys": [],
+                    "properties": {
+                        "doc_id": {
+                            "type": "string",
+                            "default": null,
+                            "required": true,
+                            "show": [
+                                "admin"
+                            ]
+                        },
+                        "value": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "fields": {
+                            "type": "object",
+                            "display": "Additional fields",
+                            "required": true,
+                            "template": "blue"
+                        }
+                    }
+                }
+            }
+        },
+        "groups": {
+            "type": "array",
+            "display": "order contents",
+            "required": true,
+            "properties": {
+                "#": {
+                    "type": "object",
+                    "todo_included": true,
+                    "template": "groups_container.tmpl",
+                    "tostring_out": [
+                        "ToDo of order #",
+                        "$_/number"
+                    ],
+                    "tostring": [
+                        "$company/fields/country/fields/code",
+                        ":",
+                        "$company",
+                        " ",
+                        "$todos",
+                        " ",
+                        "$fees",
+                        " ",
+                        "$documents"
+                    ],
+                    "properties": {
+                        "type": {
+                            "type": "list",
+                            "show": [
+                                "admin"
+                            ],
+                            "limited": true,
+                            "items": {
+                                "incorporate": {
+                                    "descriptin": ""
+                                }
+                            }
+                        },
+                        "company": {
+                            "type": "documentlinkv2",
+                            "display": "company",
+                            "displayed": true,
+                            "focusme": true,
+                            "url": "companiesofClient",
+                            "mainkey": "code",
+                            "schema": "company_schema",
+                            "keys": [
+                                {
+                                    "key": "country",
+                                    "schema": {
+                                        "required": false,
+                                        "displayed": true
+                                    }
+                                },
+                                {
+                                    "key": "authority",
+                                    "schema": {
+                                        "required": false,
+                                        "displayed": true
+                                    }
+                                },
+                                {
+                                    "key": "agent",
+                                    "schema": {
+                                        "required": false,
+                                        "displayed": true
+                                    }
+                                },
+                                {
+                                    "key": "category",
+                                    "schema": {
+                                        "required": false,
+                                        "displayed": true
+                                    }
+                                }
+                            ],
+                            "properties": {
+                                "doc_id": {
+                                    "type": "string",
+                                    "default": null,
+                                    "required": true,
+                                    "show": [
+                                        "admin"
+                                    ]
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "required": true
+                                },
+                                "fields": {
+                                    "type": "object",
+                                    "required": true,
+                                    "template": "blue"
+                                }
+                            }
+                        },
+                        "mysql": {
+                            "type": "object",
+                            "show": [
+                                "admin"
+                            ],
+                            "properties": {
+                                "company_id": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "fees": {
+                            "type": "array",
+                            "template": "fees_container.tmpl",
+                            "displayed": true,
+                            "properties": {
+                                "#": {
+                                    "type": "object",
+                                    "template": "fee.tmpl",
+                                    "tostring": [
+                                        "$description",
+                                        ":",
+                                        "$status"
+                                    ],
+                                    "properties": {
+                                        "agent": {
+                                            "type": "documentlinkv2",
+                                            "required": true,
+                                            "mainkey": "code",
+                                            "focusme": true,
+                                            "url": "_design/s_agent/_list/array/all",
+                                            "schema": "agent_schema",
+                                            "keys": [],
+                                            "properties": {
+                                                "doc_id": {
+                                                    "type": "string",
+                                                    "default": null,
+                                                    "required": true,
+                                                    "show": [
+                                                        "admin"
+                                                    ]
+                                                },
+                                                "value": {
+                                                    "type": "string",
+                                                    "required": true
+                                                },
+                                                "fields": {
+                                                    "type": "object",
+                                                    "display": "Additional fields",
+                                                    "required": true,
+                                                    "template": "blue"
+                                                }
+                                            }
+                                        },
+                                        "description": {
+                                            "type": "list",
+                                            "focusme": true,
+                                            "required": true,
+                                            "items": {
+                                                "standard Fee (order_debug)": {
+                                                    "description": "",
+                                                    "fee": {
+                                                        "value": "123",
+                                                        "currency": "RUB"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "line": {
+                                            "type": "string"
+                                        },
+                                        "fee": {
+                                            "type": "link",
+                                            "url": "shares_schema/currency",
+                                            "required": true
+                                        },
+                                        "qty": {
+                                            "type": "number",
+                                            "size": 6,
+                                            "required": true,
+                                            "default": 1
+                                        },
+                                        "status": {
+                                            "type": "list",
+                                            "limited": true,
+                                            "default": "new",
+                                            "required": true,
+                                            "items": {
+                                                "new": {
+                                                    "description": ""
+                                                },
+                                                "confirmed": {
+                                                    "description": ""
+                                                },
+                                                "done": {
+                                                    "description": ""
+                                                },
+                                                "cancelled": {
+                                                    "description": ""
+                                                }
+                                            }
+                                        },
+                                        "notes": {
+                                            "type": "string",
+                                            "required": true,
+                                            "template": "regular_valueOnly.tmpl"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "documents": {
+                            "type": "object",
+                            "order": "down",
+                            "displayed": true,
+                            "tostring": [
+                                "$required",
+                                " ",
+                                "$prepared"
+                            ],
+                            "properties": {
+                                "required": {
+                                    "type": "array",
+                                    "order": "down",
+                                    "template": "docs_container_required.tmpl",
+                                    "tostring": [
+                                        "$self_value"
+                                    ],
+                                    "minItems": 1,
+                                    "properties": {
+                                        "#": {
+                                            "type": "object",
+                                            "template": "docs_required.tmpl",
+                                            "tostring": [
+                                                "$name"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "documentlinkv2",
+                                                    "required": true,
+                                                    "mainkey": "code",
+                                                    "focusme": true,
+                                                    "url": "_design/s_document/_list/array/all",
+                                                    "schema": "document_schema",
+                                                    "keys": [],
+                                                    "filters": [
+                                                        {
+                                                            "description": "Documents with category like company have",
+                                                            "path": "../../../../company/fields/category",
+                                                            "key": "category",
+                                                            "type": 0
+                                                        }
+                                                    ],
+                                                    "properties": {
+                                                        "doc_id": {
+                                                            "type": "string",
+                                                            "default": null,
+                                                            "required": true,
+                                                            "show": [
+                                                                "admin"
+                                                            ]
+                                                        },
+                                                        "value": {
+                                                            "type": "string",
+                                                            "required": true
+                                                        },
+                                                        "fields": {
+                                                            "type": "object",
+                                                            "display": "Additional fields",
+                                                            "required": true,
+                                                            "template": "blue"
+                                                        }
+                                                    }
+                                                },
+                                                "received": {
+                                                    "type": "date",
+                                                    "regexp": "^\\d\\d\\d\\d-\\d\\d-\\d\\d$",
+                                                    "instruction": "Format of date must be YYYY-MM-DD (ex. 2001-01-01)"
+                                                },
+                                                "storage": {
+                                                    "type": "string",
+                                                    "description": "file storage",
+                                                    "displayed": true
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "prepared": {
+                                    "type": "array",
+                                    "order": "down",
+                                    "tostring": [
+                                        "$self_value"
+                                    ],
+                                    "minItems": 1,
+                                    "template": "docs_container_prepared.tmpl",
+                                    "properties": {
+                                        "#": {
+                                            "type": "object",
+                                            "template": "docs_prepared.tmpl",
+                                            "tostring": [
+                                                "$name",
+                                                ":",
+                                                "$qty"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "documentlinkv2",
+                                                    "required": true,
+                                                    "mainkey": "code",
+                                                    "focusme": true,
+                                                    "url": "_design/s_document/_list/array/all",
+                                                    "schema": "document_schema",
+                                                    "keys": [],
+                                                    "properties": {
+                                                        "doc_id": {
+                                                            "type": "string",
+                                                            "default": null,
+                                                            "required": true,
+                                                            "show": [
+                                                                "admin"
+                                                            ]
+                                                        },
+                                                        "value": {
+                                                            "type": "string",
+                                                            "required": true
+                                                        },
+                                                        "fields": {
+                                                            "type": "object",
+                                                            "display": "Additional fields",
+                                                            "required": true,
+                                                            "template": "blue"
+                                                        }
+                                                    }
+                                                },
+                                                "qty": {
+                                                    "type": "number",
+                                                    "description": "qty",
+                                                    "default": 1,
+                                                    "required": true
+                                                },
+                                                "prepared": {
+                                                    "type": "date",
+                                                    "regexp": "^\\d\\d\\d\\d-\\d\\d-\\d\\d$",
+                                                    "instruction": "Format of date must be YYYY-MM-DD (ex. 2001-01-01)"
+                                                },
+                                                "storage": {
+                                                    "type": "string",
+                                                    "description": "file storage",
+                                                    "displayed": true
+                                                },
+                                                "agent": {
+                                                    "type": "documentlinkv2",
+                                                    "mainkey": "code",
+                                                    "displayed": true,
+                                                    "url": "_design/s_agent/_list/array/all",
+                                                    "schema": "agent_schema",
+                                                    "keys": [],
+                                                    "properties": {
+                                                        "doc_id": {
+                                                            "type": "string",
+                                                            "default": null,
+                                                            "required": true,
+                                                            "show": [
+                                                                "admin"
+                                                            ]
+                                                        },
+                                                        "value": {
+                                                            "type": "string",
+                                                            "required": true
+                                                        },
+                                                        "fields": {
+                                                            "type": "object",
+                                                            "display": "Additional fields",
+                                                            "required": true,
+                                                            "template": "blue"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "order_date": {
+            "type": "string",
+            "required": true,
+            "display": "received",
+            "default": ""
+        },
+        "created": {
+            "type": "string",
+            "display": "created",
+            "displayed": true,
+            "default": "$current_date"
+        },
+        "due_date": {
+            "type": "date",
+            "display": "due",
+            "displayed": true,
+            "regexp": "^\\d\\d\\d\\d-\\d\\d-\\d\\d|$",
+            "instruction": "Format of date must be YYYY-MM-DD (ex. 2001-01-01)"
+        },
+        "notes": {
+            "type": "string",
+            "displayed": true
+        },
+        "emails": {
+            "type": "array",
+            "properties": {
+                "#": {
+                    "type": "object",
+                    "tostring": [
+                        "$text"
+                    ],
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "from": {
+                            "type": "string"
+                        },
+                        "subject": {
+                            "type": "string"
+                        },
+                        "date": {
+                            "type": "string"
+                        },
+                        "text": {
+                            "type": "string"
+                        },
+                        "to": {
+                            "type": "array",
+                            "properties": {
+                                "#": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "status": {
+            "type": "list",
+            "required": true,
+            "default": "new",
+            "limited": true,
+            "items": {
+                "new": {
+                    "description": ""
+                },
+                "confirmed": {
+                    "description": ""
+                },
+                "completed": {
+                    "description": ""
+                },
+                "cancelled": {
+                    "description": ""
+                },
+                "unknown": {
+                    "description": ""
+                }
+            }
+        },
+        "priority": {
+            "type": "number",
+            "default": 0,
+            "displayed": true
+        },
+        "labels": {
+            "type": "array",
+            "properties": {
+                "#": {
+                    "type": "string"
+                }
+            }
+        },
+        "waiting": {
+            "type": "object",
+            "required": true,
+            "template": "split_e.tmpl",
+            "properties": {
+                "wait_docs": {
+                    "type": "boolean",
+                    "required": true,
+                    "description": "waiting for documents",
+                    "display": "waiting for documents"
+                },
+                "wait_pay": {
+                    "type": "boolean",
+                    "required": true,
+                    "description": "waiting for payment",
+                    "display": "waiting for payment"
+                }
+            }
+        },
+        "contacts": {
+            "type": "array",
+            "displayed": true,
+            "tostring": [
+                "$self_value"
+            ],
+            "properties": {
+                "#": {
+                    "type": "documentlinkv2",
+                    "focusme": true,
+                    "displayed": true,
+                    "mainkey": "name",
+                    "url": "contactsofClient",
+                    "schema": "person_schema",
+                    "keys": [
+                        {
+                            "key": "emails"
+                        },
+                        {
+                            "key": "code"
+                        }
+                    ],
+                    "properties": {
+                        "doc_id": {
+                            "type": "string",
+                            "default": null,
+                            "required": true,
+                            "show": [
+                                "admin"
+                            ]
+                        },
+                        "value": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "fields": {
+                            "type": "object",
+                            "display": "Additional fields",
+                            "required": true,
+                            "template": "blue"
+                        }
+                    }
+                }
+            }
+        },
+        "invoices": {
+            "type": "array",
+            "displayed": true,
+            "properties": {
+                "#": {
+                    "type": "documentlinkv2",
+                    "focusme": true,
+                    "mainkey": "number",
+                    "url": "_design/s_invoice/_list/array/all",
+                    "schema": "invoice_schema",
+                    "keys": [],
+                    "properties": {
+                        "doc_id": {
+                            "type": "string",
+                            "default": null,
+                            "required": true,
+                            "show": [
+                                "admin"
+                            ]
+                        },
+                        "value": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "fields": {
+                            "type": "object",
+                            "display": "Additional fields",
+                            "required": true,
+                            "template": "blue"
+                        }
+                    }
+                }
+            }
+        },
+        "bills": {
+            "type": "array",
+            "displayed": true,
+            "properties": {
+                "#": {
+                    "type": "documentlinkv2",
+                    "focusme": true,
+                    "mainkey": "number",
+                    "url": "_design/s_invoice/_list/array/all",
+                    "schema": "invoice_schema",
+                    "keys": [],
+                    "properties": {
+                        "doc_id": {
+                            "type": "string",
+                            "default": null,
+                            "required": true,
+                            "show": [
+                                "admin"
+                            ]
+                        },
+                        "value": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "fields": {
+                            "type": "object",
+                            "display": "Additional fields",
+                            "required": true,
+                            "template": "blue"
+                        }
+                    }
+                }
+            }
+        },
+        "links": {
+            "type": "array",
+            "properties": {
+                "#": {
+                    "type": "object",
+                    "template": "url",
+                    "tostring": [
+                        "$name"
+                    ],
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "link": {
+                            "type": "string",
+                            "required": true
+                        }
+                    }
+                }
+            }
+        },
+        "files": {
+            "type": "link",
+            "url": "shares_schema/files"
+        },
+        "_id": {
+            "type": "string",
+            "show_roles": [
+                "_admin"
+            ]
+        },
+        "_rev": {
+            "type": "string",
+            "show_roles": [
+                "_admin"
+            ]
+        },
+        "_attachments": {
+            "type": "link",
+            "url": "shares_schema/_attachments"
+        },
+        "changes": {
+            "type": "link",
+            "url": "shares_schema/changes"
+        },
+        "history": {
+            "type": "link",
+            "url": "shares_schema/historyv2"
+        },
+        "type": {
+            "type": "link",
+            "url": "shares_schema/type",
+            "properties": {
+                "#": {
+                    "default": "order"
+                }
+            }
+        }
+    }
+}

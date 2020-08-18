@@ -1,0 +1,154 @@
+{
+    "_id": "assessment_2.0.0",
+    "_rev": "10-2d1f4a961029570964538d49fd7687ca",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "assessment",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "type": "string"
+        },
+        "template": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "jurisdiction": {
+            "type": "string"
+        },
+        "assessed_on": {
+            "type": "string"
+        },
+        "percent": {
+            "type": "string"
+        },
+        "comment": {
+            "type": "string"
+        },
+        "entered_by": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "_id",
+                "name"
+            ],
+            "additionalProperties": false
+        },
+        "entity": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "class": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "dob": {
+                    "type": "string"
+                },
+                "country": {
+                    "$ref": "#country_2.0.0"
+                }
+            },
+            "required": [
+                "_id",
+                "name",
+                "class",
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "risks": {
+            "type": "array",
+            "additionalItems": false,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string"
+                                },
+                                "values": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "weight": {
+                                                "type": "integer"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "weight",
+                                            "name"
+                                        ],
+                                        "additionalProperties": false
+                                    }
+                                }
+                            },
+                            "optional": [
+                                "values"
+                            ],
+                            "required": [
+                                "description"
+                            ],
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                "required": [
+                    "name",
+                    "type",
+                    "items"
+                ],
+                "additionalProperties": false
+            }
+        }
+    },
+    "required": [
+        "schema_id",
+        "class",
+        "assessed_on",
+        "entered_by",
+        "entity",
+        "risks"
+    ],
+    "additionalProperties": false
+}

@@ -1,0 +1,149 @@
+{
+    "_id": "order_2.0.0",
+    "_rev": "17-31526a134f080c8e67c6948333878226",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "order",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "number": {
+            "type": "string"
+        },
+        "client": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "manager": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "initials": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "name",
+                "initials"
+            ]
+        },
+        "client_reference": {
+            "type": "string"
+        },
+        "contacts": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "initials": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "initials"
+                    ]
+                }
+            ],
+            "minItems": 1
+        },
+        "created_on": {
+            "type": "string"
+        },
+        "quotes": {
+            "type": "array",
+            "items": {
+                "$ref": "#quote_2.0.0"
+            }
+        },
+        "companies": {
+            "type": "array",
+            "items": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "name"
+                    ]
+                }
+            ]
+        },
+        "message_ids": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "type": {
+            "type": "array",
+            "items": [
+                {
+                    "enum": [
+                        "CGS",
+                        "CGS+apostille",
+                        "incorporation",
+                        "incumbency",
+                        "misc",
+                        "renewal"
+                    ]
+                }
+            ]
+        },
+        "comments": {
+            "type": "array",
+            "items": {
+                "$ref": "#comment_2.0.0"
+            }
+        }
+    },
+    "required": [
+        "schema_id",
+        "class",
+        "client",
+        "manager",
+        "contacts",
+        "message_ids"
+    ]
+}

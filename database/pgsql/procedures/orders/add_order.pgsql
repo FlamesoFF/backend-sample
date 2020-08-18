@@ -40,6 +40,7 @@ BEGIN
         ,company_id
         ,client_reference
         ,data
+        ,client_id
     )
     VALUES (
         v_order_id
@@ -53,6 +54,7 @@ BEGIN
         ,p_company_id
         ,p_client_reference
 		,p_order_data
+		,p_client_id
     )
     RETURNING
         order_id

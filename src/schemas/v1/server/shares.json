@@ -1,0 +1,767 @@
+{
+    "_id": "shares_v1",
+    "name": "shares_schema",
+    "properties": {
+        "class": {
+            "type": "list",
+            "limited": true,
+            "items": {
+                "company": {
+                    "description": ""
+                },
+                "person": {
+                    "description": ""
+                },
+                "document": {
+                    "description": ""
+                },
+                "email": {
+                    "description": ""
+                },
+                "file": {
+                    "description": ""
+                },
+                "token": {
+                    "description": ""
+                }
+            },
+            "default": ""
+        },
+        "email_id": {
+            "type": "object",
+            "display": "relaited email",
+            "template": "email_url.tmpl",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "required": true
+                },
+                "email": {
+                    "type": "string",
+                    "required": true
+                }
+            }
+        },
+        "structured_address": {
+            "type": "object",
+            "tostring": [
+                "$self_value"
+            ],
+            "properties": {
+                "company": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "address_1": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "address_2": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "address_3": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "postal_code": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "city": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "suburb": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "state_province": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "phone": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "mobile": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "fax": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "email": {
+                    "type": "string",
+                    "displayed": true
+                },
+                "entered_address": {
+                    "type": "string",
+                    "displayed": true
+                }
+            }
+        },
+        "documentlink": {
+            "type": "object",
+            "properties": {}
+        },
+        "offices": {
+            "type": "array",
+            "order": "up",
+            "required": true,
+            "show": [
+                "admin"
+            ],
+            "minItems": 1,
+            "properties": {
+                "#": {
+                    "type": "list",
+                    "limited": true,
+                    "default": "SC",
+                    "items": {
+                        "SC": {
+                            "description": "Republic of Seychelles"
+                        },
+                        "CY": {
+                            "description": "Republic of Cyprus"
+                        },
+                        "UK": {
+                            "description": "United Kingdom of Great Britain and Northern Ireland"
+                        },
+                        "UA": {
+                            "description": "Ukraine"
+                        },
+                        "RF": {
+                            "description": "Russian Federation"
+                        }
+                    }
+                }
+            }
+        },
+        "_attachments": {
+            "type": "object",
+            "show_roles": [
+                "_admin"
+            ],
+            "properties": {
+                "*": {
+                    "type": "object",
+                    "properties": {
+                        "content_type": {
+                            "type": "string"
+                        },
+                        "digest": {
+                            "type": "string"
+                        },
+                        "revpos": {
+                            "type": "number"
+                        },
+                        "length": {
+                            "type": "number"
+                        },
+                        "stub": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "type": {
+            "type": "array",
+            "show_roles": [
+                "_admin"
+            ],
+            "display": "Types of document",
+            "required": true,
+            "show": [
+                "admin"
+            ],
+            "minItems": 1,
+            "properties": {
+                "#": {
+                    "type": "list",
+                    "limited": true,
+                    "items": {
+                        "company": {
+                            "description": ""
+                        },
+                        "client": {
+                            "description": ""
+                        },
+                        "agent": {
+                            "description": ""
+                        },
+                        "invoice": {
+                            "description": ""
+                        },
+                        "order": {
+                            "description": ""
+                        },
+                        "courier": {
+                            "description": ""
+                        },
+                        "person": {
+                            "description": ""
+                        },
+                        "country": {
+                            "description": ""
+                        },
+                        "authority": {
+                            "description": ""
+                        },
+                        "doc_type": {
+                            "description": ""
+                        },
+                        "account": {
+                            "description": ""
+                        },
+                        "stock_item": {
+                            "description": ""
+                        },
+                        "transaction": {
+                            "description": ""
+                        },
+                        "employee": {
+                            "description": ""
+                        },
+                        "comments": {
+                            "description": ""
+                        },
+                        "todo": {
+                            "description": ""
+                        },
+                        "phone_bill": {
+                            "description": ""
+                        },
+                        "manager": {
+                            "description": ""
+                        },
+                        "sender": {
+                            "description": ""
+                        },
+                        "payment": {
+                            "description": ""
+                        },
+                        "bank": {
+                            "description": ""
+                        },
+                        "group": {
+                            "description": ""
+                        },
+                        "document_instance": {
+                            "description": ""
+                        },
+                        "scan_queue": {
+                            "description": ""
+                        },
+                        "user": {
+                            "description": ""
+                        },
+                        "webuser": {
+                            "description": ""
+                        }
+                    },
+                    "default": ""
+                }
+            }
+        },
+        "currency": {
+            "type": "object",
+            "template": "currency.tmpl",
+            "tostring": [
+                "$value",
+                " ",
+                "$currency"
+            ],
+            "properties": {
+                "rate": {
+                    "type": "number",
+                    "required": true,
+                    "default": 1
+                },
+                "value": {
+                    "type": "number",
+                    "format": "currency",
+                    "required": true
+                },
+                "currency": {
+                    "type": "list",
+                    "required": true,
+                    "limited": true,
+                    "default": "USD",
+                    "items": {
+                        "USD": {
+                            "description": ""
+                        },
+                        "EUR": {
+                            "description": ""
+                        },
+                        "GBP": {
+                            "description": ""
+                        },
+                        "RUB": {
+                            "description": ""
+                        },
+                        "SCR": {
+                            "description": ""
+                        }
+                    }
+                }
+            }
+        },
+        "country": {
+            "type": "documentlinkv2",
+            "mainkey": "name",
+            "url": "_design/s_country/_list/array/all",
+            "schema": "country_schema",
+            "keys": [
+                {
+                    "key": "code"
+                }
+            ],
+            "properties": {
+                "doc_id": {
+                    "type": "string",
+                    "default": null,
+                    "required": true,
+                    "show": [
+                        "admin"
+                    ]
+                },
+                "value": {
+                    "type": "string",
+                    "required": true
+                },
+                "fields": {
+                    "type": "object",
+                    "display": "Additional fields",
+                    "required": true,
+                    "template": "blue"
+                }
+            }
+        },
+        "category": {
+            "type": "list",
+            "items": {
+                "unknown": {
+                    "description": ""
+                },
+                "LTD": {
+                    "description": "Limited"
+                },
+                "LP": {
+                    "description": "Limited Partnership"
+                },
+                "Trust": {
+                    "description": "Trust"
+                },
+                "CSL": {
+                    "description": "Company Special License"
+                },
+                "Foundation": {
+                    "description": "Foundation"
+                }
+            }
+        },
+        "comments": {
+            "type": "array",
+            "required": true,
+            "order": "up",
+            "template": "comments_container.tmpl",
+            "properties": {
+                "#": {
+                    "type": "object",
+                    "tostring": [
+                        "$author",
+                        ":",
+                        "$body"
+                    ],
+                    "template": "comment",
+                    "properties": {
+                        "id": {
+                            "type": "number"
+                        },
+                        "body": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "created_on": {
+                            "type": "date",
+                            "required": true,
+                            "regexp": "^\\d\\d\\d\\d-\\d\\d-\\d\\d$",
+                            "instruction": "Format of date must be YYYY-MM-DD (ex. 2001-01-01)"
+                        },
+                        "created_on_time": {
+                            "type": "string",
+                            "required": true,
+                            "regexp": "^\\d\\d\\:\\d\\d:\\d\\d$",
+                            "instruction": "Format of time must be HH-MM-SS (ex. 16:01:01)"
+                        },
+                        "author": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "emailed_from": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "phones": {
+            "type": "array",
+            "displayed": true,
+            "tostring": [
+                "$self_value"
+            ],
+            "properties": {
+                "#": {
+                    "type": "object",
+                    "template": "split_e.tmpl",
+                    "tostring": [
+                        "$number"
+                    ],
+                    "properties": {
+                        "type": {
+                            "type": "list",
+                            "template": "onlyvalue_e.tmpl",
+                            "display": "phone type",
+                            "description": "phone type",
+                            "required": true,
+                            "default": "work",
+                            "items": {
+                                "work": {
+                                    "description": ""
+                                },
+                                "home": {
+                                    "description": ""
+                                },
+                                "mobile": {
+                                    "description": ""
+                                }
+                            }
+                        },
+                        "number": {
+                            "type": "string",
+                            "template": "onlyvalue_e.tmpl",
+                            "display": "phone number",
+                            "description": "phone number",
+                            "required": true,
+                            "focusme": true
+                        }
+                    }
+                }
+            }
+        },
+        "emails": {
+            "type": "array",
+            "displayed": true,
+            "display": "e-mails",
+            "tostring": [
+                "$self_value"
+            ],
+            "properties": {
+                "#": {
+                    "type": "object",
+                    "template": "split_e.tmpl",
+                    "tostring": [
+                        "$address"
+                    ],
+                    "properties": {
+                        "type": {
+                            "type": "list",
+                            "template": "onlyvalue_e.tmpl",
+                            "display": "type",
+                            "description": "type",
+                            "required": true,
+                            "default": "work",
+                            "items": {
+                                "work": {
+                                    "description": ""
+                                },
+                                "home": {
+                                    "description": ""
+                                }
+                            }
+                        },
+                        "address": {
+                            "type": "string",
+                            "template": "onlyvalue_e.tmpl",
+                            "display": "e-mail",
+                            "description": "e-mail",
+                            "required": true,
+                            "focusme": true
+                        }
+                    }
+                }
+            }
+        },
+        "faxes": {
+            "type": "array",
+            "displayed": true,
+            "display": "faxes",
+            "tostring": [
+                "$self_value"
+            ],
+            "properties": {
+                "#": {
+                    "type": "object",
+                    "template": "split_e.tmpl",
+                    "tostring": [
+                        "$number"
+                    ],
+                    "properties": {
+                        "type": {
+                            "type": "list",
+                            "template": "onlyvalue_e.tmpl",
+                            "display": "type",
+                            "description": "type",
+                            "required": true,
+                            "default": "work",
+                            "items": {
+                                "work": {
+                                    "description": ""
+                                },
+                                "home": {
+                                    "description": ""
+                                }
+                            }
+                        },
+                        "number": {
+                            "type": "string",
+                            "template": "onlyvalue_e.tmpl",
+                            "display": "fax",
+                            "description": "fax",
+                            "required": true,
+                            "focusme": true
+                        }
+                    }
+                }
+            }
+        },
+        "contacts": {
+            "type": "array",
+            "displayed": true,
+            "tostring": [
+                "$self_value"
+            ],
+            "properties": {
+                "#": {
+                    "type": "documentlinkv2",
+                    "displayed": true,
+                    "mainkey": "name",
+                    "url": "_design/s_person/_list/array/all",
+                    "schema": "person_schema",
+                    "keys": [
+                        {
+                            "key": "emails"
+                        },
+                        {
+                            "key": "code"
+                        }
+                    ],
+                    "properties": {
+                        "doc_id": {
+                            "type": "string",
+                            "default": null,
+                            "required": true,
+                            "show": [
+                                "admin"
+                            ]
+                        },
+                        "value": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "fields": {
+                            "type": "object",
+                            "display": "Additional fields",
+                            "required": true,
+                            "template": "blue"
+                        }
+                    }
+                }
+            }
+        },
+        "files": {
+            "type": "object",
+            "required": true,
+            "properties": {
+                "*": {
+                    "type": "object",
+                    "template": "file",
+                    "properties": {
+                        "filename": {
+                            "required": true,
+                            "type": "string"
+                        },
+                        "description": {
+                            "required": true,
+                            "type": "string"
+                        },
+                        "url": {
+                            "required": true,
+                            "type": "string"
+                        },
+                        "author": {
+                            "required": true,
+                            "type": "object",
+                            "properties": {
+                                "value": {
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "doc_id": {
+                                    "required": true,
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "created_on": {
+                            "required": true,
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "changes": {
+            "show": [
+                "admin"
+            ],
+            "type": "array",
+            "template": "table",
+            "properties": {
+                "#": {
+                    "type": "array",
+                    "minItems": 4,
+                    "properties": {
+                        "0": {
+                            "type": "string",
+                            "display": "key",
+                            "description": "key",
+                            "required": true
+                        },
+                        "1": {
+                            "type": "string",
+                            "display": "description",
+                            "description": "description"
+                        },
+                        "2": {
+                            "type": "string",
+                            "required": true,
+                            "regexp": "^\\d\\d\\d\\d-\\d\\d-\\d\\d$",
+                            "instruction": "Format of date must be YYYY-MM-DD (ex. 2001-01-01)",
+                            "description": "Date of Last Change for selected group",
+                            "display": "date"
+                        },
+                        "3": {
+                            "type": "string",
+                            "required": true,
+                            "display": "value",
+                            "description": "The Previous Value"
+                        }
+                    }
+                }
+            }
+        },
+        "historyv2": {
+            "type": "object",
+            "show": [
+                "admin"
+            ],
+            "properties": {
+                "*": {
+                    "type": "object",
+                    "description": "time stamp",
+                    "tostring": [
+                        "$self_key"
+                    ],
+                    "properties": {
+                        "*": {
+                            "type": "array",
+                            "required": true,
+                            "template": "table",
+                            "tostring": [
+                                "$0"
+                            ],
+                            "minItems": 1,
+                            "description": "user who made changes",
+                            "properties": {
+                                "#": {
+                                    "type": "array",
+                                    "minItems": 3,
+                                    "description": "record about change",
+                                    "properties": {
+                                        "0": {
+                                            "type": "string",
+                                            "display": "new key",
+                                            "description": "new name of key",
+                                            "default": null
+                                        },
+                                        "1": {
+                                            "type": "string",
+                                            "default": null,
+                                            "display": "old value",
+                                            "description": "old value"
+                                        },
+                                        "2": {
+                                            "type": "string",
+                                            "display": "old key",
+                                            "default": null,
+                                            "description": "old name of key"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "history": {
+            "type": "object",
+            "show": [
+                "admin"
+            ],
+            "properties": {
+                "*": {
+                    "type": "object",
+                    "description": "row of history",
+                    "properties": {
+                        "user": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "operations": {
+                            "type": "array",
+                            "tostring": [
+                                "$0"
+                            ],
+                            "required": true,
+                            "properties": {
+                                "#": {
+                                    "type": "object",
+                                    "properties": {
+                                        "typeofmodify": {
+                                            "type": "string",
+                                            "required": true
+                                        },
+                                        "target": {
+                                            "type": "string",
+                                            "required": true
+                                        },
+                                        "olddata": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

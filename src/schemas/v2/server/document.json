@@ -1,0 +1,17 @@
+{
+    "_id": "document_2.0.0",
+    "_rev": "1-657985636375ec4db42e1cde6f433a07",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "document",
+    "version": "2.0.0",
+    "type": "object",
+    "anyOf": [
+        {
+            "$ref": "#business_document_2.0.0"
+        },
+        {
+            "$ref": "#supporting_document_2.0.0"
+        }
+    ]
+}

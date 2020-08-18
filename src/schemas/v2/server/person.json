@@ -1,0 +1,125 @@
+{
+    "_id": "person_2.0.0",
+    "_rev": "36-643c8b04c1df865a5a9e479ca25debaf",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "class": "schema",
+    "name": "person",
+    "version": "2.0.0",
+    "type": "object",
+    "properties": {
+        "_id": {
+            "type": "string"
+        },
+        "_rev": {
+            "type": "string"
+        },
+        "schema_id": {
+            "type": "string"
+        },
+        "class": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "date_of_birth": {
+            "type": "string"
+        },
+        "place_of_birth": {
+            "type": "string"
+        },
+        "country_of_birth": {
+            "type": "string"
+        },
+        "country": {
+            "type": "object"
+        },
+        "occupation": {
+            "type": "string"
+        },
+        "organization": {
+            "type": "string"
+        },
+        "address": {
+            "type": "string"
+        },
+        "phone": {
+            "type": "string"
+        },
+        "initials": {
+            "type": "string"
+        },
+        "ip": {
+            "type": "string"
+        },
+        "login": {
+            "type": "string"
+        },
+        "email": {
+            "type": "string"
+        },
+        "nationality": {
+            "type": "array"
+        },
+        "comments": {
+            "type": "array"
+        },
+        "structured_name": {
+            "type": "object",
+            "properties": {
+                "family": {
+                    "type": "string"
+                },
+                "given": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "family",
+                "given"
+            ],
+            "additionalProperties": false
+        },
+        "type": {
+            "type": "array",
+            "items": [
+                {
+                    "enum": [
+                        "agent",
+                        "attorney",
+                        "beneficial owner",
+                        "client",
+                        "contact",
+                        "director",
+                        "employee",
+                        "notary",
+                        "receiver",
+                        "sender",
+                        "shareholder",
+                        "user",
+                        "webuser"
+                    ]
+                }
+            ]
+        },
+        "quotes": {
+            "type": "array",
+            "items": {
+                "$ref": "#quote_2.0.0"
+            }
+        },
+        "notes": {
+            "type": "string"
+        },
+        "relations": {
+            "type": "array"
+        }
+    },
+    "required": [
+        "schema_id",
+        "class",
+        "name",
+        "date_of_birth"
+    ],
+    "additionalProperties": false
+}

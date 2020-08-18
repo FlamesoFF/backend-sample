@@ -1,74 +1,72 @@
-import { NextFunction, Request, Response, Errback } from 'express';
-import { Responses } from '../@types/api/controllers.types';
 import { ValidationError } from 'ajv';
 import { ApiError } from '../errors';
 import { isApiError, isNodeError, isValidationError } from '../../shared/utils/typeGuards';
-import { format } from 'logform';
-import ms = format.ms;
+import { ApiResponse, ResponseFormatterData } from './types';
 
 
-export interface ResponseFormatterData {
-    id?: string
-    body?: any
-}
+export abstract class ResponseDirector {
+    static buildSuccessfulResponse( data: ResponseFormatterData ): ApiResponse {
+        const builder = new ResponseBuilder(true);
 
-export class ApiResponse {
-    private errors?: string[] = []   // if there's some errors
-    private warnings?: string[] = []   // if there's some warnings
+        builder.setId(data.id);
+        builder.setBody(data.body);
 
-
-    constructor(
-        private ok: boolean, /* operation result */
-        private id?: string,   // if something has been created or updated
-        private data?: any    // if server returns some data
-    ) {
+        return builder.getResult();
     }
 
+    static buildErrorResponse( data: ResponseFormatterData ): ApiResponse {
+        const builder = new ResponseBuilder(false);
 
-    static addError(response: ApiResponse, error: ApiError | ValidationError | Error) {
-        if (isApiError(error)) {
-            response.errors.push(error.message);
+        for ( const error of data.errors ) {
+            builder.addError(error);
         }
-        else if (isValidationError(error)) {
-            for (const msg of error.errors) {
-                response.errors.push(JSON.stringify(msg));
+
+        if ( data.warnings ) {
+            for ( const warning of data.warnings ) {
+                builder.addWarning(warning);
             }
         }
-        else if (isNodeError(error)) {
-            response.errors.push(error.message);
-        }
-    }
 
-    static addWarning(response: ApiResponse, warning: string) {
-        response.warnings.push(warning);
+        return builder.getResult();
     }
 }
 
-//
-// interface FormatParameters {
-//     request: Request
-//     response: Response
-//     next: NextFunction
-//     error?: AppError & Error
-// }
-//
-// function format({
-//     request,
-//     response,
-//     next,
-//     error
-// }: FormatParameters) {
-//
-// }
+
+class ResponseBuilder {
+    private apiResponse: ApiResponse = {
+        ok: true
+    };
+
+    constructor( status: boolean = true ) {
+        if ( !status ) this.apiResponse.errors = [];
+    }
+
+    addError( error: ApiError | ValidationError | Error ) {
+        if ( isApiError(error) ) {
+            this.apiResponse.errors.push(error.message);
+        } else if ( isValidationError(error) ) {
+            for ( const msg of error.errors ) {
+                this.apiResponse.errors.push(JSON.stringify(msg));
+            }
+        } else if ( isNodeError(error) ) {
+            this.apiResponse.errors.push(error.message);
+        }
+    }
+
+    addWarning( warning: string ) {
+        this.apiResponse.warnings.push(warning);
+    }
+
+    setId( id: string ) {
+        this.apiResponse.id = id;
+    }
+
+    setBody( data: any ) {
+        this.apiResponse.data = data;
+    }
 
 
-export function apiResponseHandler(
-    request: Request,
-    response: Response,
-    next: NextFunction
-) {
-    const formattedResponse = new ApiResponse(false);
-
-    response.send(formattedResponse);
-    next();
+    getResult(): ApiResponse {
+        return this.apiResponse;
+    }
 }

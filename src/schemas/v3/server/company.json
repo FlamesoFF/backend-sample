@@ -78,27 +78,6 @@
         "country": {
             "$ref": "server_definitions_v3#/definitions/country"
         },
-        "modified_by": {
-            "type": "object",
-            "required": [
-                "_id",
-                "name"
-            ],
-            "properties": {
-                "_id": {
-                    "type": "string",
-                    "examples": [
-                        "tester"
-                    ]
-                },
-                "name": {
-                    "type": "string",
-                    "examples": [
-                        "Tester"
-                    ]
-                }
-            }
-        },
         "relations": {
             "type": "array",
             "items": {

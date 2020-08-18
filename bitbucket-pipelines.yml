@@ -8,9 +8,87 @@ image: node:latest
 pipelines:
   default:
     - step:
+        name: Unit tests
+        max-time: 3
         caches:
           - node
-        script: # Modify the commands below to build your repository.
-          - node -v
+        script:
           - npm install
-          - npm run test-unit
+          - npm run test-unit:coverage
+
+    - step:
+        name: API integration tests
+        max-time: 5
+        caches:
+          - node
+        script:
+          - mkdir -p ~/.ssh
+          - cat my_known_hosts >> ~/.ssh/known_hosts
+          - (umask  077 ; echo $SSH_AUTH_PEM | base64 --decode > ~/.ssh/id_rsa)
+#          - ssh <user>@<host> 'echo "connected to `host` as $USER"'
+
+          - npm install
+
+          - npm run initialize-cdb -- --config config.bitbucket.pipeline.json
+          - npm run initialize-pgsql -- --config config.bitbucket.pipeline.json
+#         - npm run initialize-neo4j -- --config config.bitbucket.pipeline.json
+
+          - ssh -fN ubuntu@52.17.236.197 -L *:3006:localhost:3006 # opening SSH tunnel to authorization service
+
+          - npm run test-integration:coverage -- --config config.bitbucket.pipeline.json
+        services:
+          - postgres
+          - couchdb
+          - neo4j
+
+  branches:
+    master:
+      - step:
+          name: Deploy to the Test Server
+          max-time: 7
+          deployment: Test
+          script:
+            - mkdir -p ~/.ssh
+            - cat my_known_hosts >> ~/.ssh/known_hosts
+            - (umask  077 ; echo $SSH_PEM | base64 --decode > ~/.ssh/id_rsa)
+  #          - ssh <user>@<host> 'echo "connected to `host` as $USER"'
+
+            - ssh ubuntu@54.76.216.20 sudo docker container stop API
+            - ssh ubuntu@54.76.216.20 sudo docker container stop Synchronizer
+
+            - ssh ubuntu@54.76.216.20 sudo docker container rm API
+            - ssh ubuntu@54.76.216.20 sudo docker container rm Synchronizer
+
+            - ssh ubuntu@54.76.216.20 sudo docker pull aka4u/apollo4u:api
+            - ssh ubuntu@54.76.216.20 sudo docker pull aka4u/apollo4u:synchronizer
+
+            - ssh ubuntu@54.76.216.20 sudo docker container run --name API -p 3033:3033 -p 3034:3034 -t --detach aka4u/apollo4u:api
+            - ssh ubuntu@54.76.216.20 sudo docker container run --name Synchronizer -t --detach aka4u/apollo4u:synchronizer
+
+
+definitions:
+  services:
+    couchdb:
+      image: couchdb:2.3.1
+      variables:
+        COUCHDB_DB: 'pipelines'
+        COUCHDB_USER: 'tester'
+        COUCHDB_PASSWORD: 'tester'
+      ports:
+        - 5984:5984
+
+    postgres:
+      image: postgres:12.3
+      variables:
+        POSTGRES_DB: 'pipelines'
+        POSTGRES_PASSWORD: 'tester'
+      ports:
+       - 5432:5432
+
+    neo4j:
+      image: neo4j:4.1.1
+      variables:
+        NEO4J_AUTH: 'none'
+      ports:
+        - 7474:7474
+        - 7687:7687

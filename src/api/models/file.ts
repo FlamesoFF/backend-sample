@@ -43,7 +43,7 @@ export class FileModel implements IFileDocument {
         return files.filter(file => file.originalname === name)[0];
     }
 
-    static addFileDetails(fileDoc: IFileDocument, fileDetail: FileDetail) {
+    static addFileDetails(fileDoc: IFileDocument, fileDetail: FileDetails) {
         const { user } = MwAuth;
 
         !fileDoc.files ? fileDoc.files = [] : fileDoc.files;
@@ -53,13 +53,13 @@ export class FileModel implements IFileDocument {
 }
 
 
-export class FileDetail implements IFileDetails {
+export class FileDetails implements IFileDetails {
     // sha-256
     sha: string;
     // md5
     digest: string;
     type: string;
-    created_on: string;
+    created_on: number;
     created_by: TCreatedBy;
 
     description?: string;
@@ -74,7 +74,7 @@ export class FileDetail implements IFileDetails {
 
         this.sha = sha;
         this.digest = digest;
-        this.created_on = moment().utc().format(DATE_PATTERN);
+        this.created_on = moment().unix();
         this.created_by = {
             _id,
             name

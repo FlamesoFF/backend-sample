@@ -13,10 +13,8 @@ export class ApiError {
         const { code, description } = error;
         const formattedDetails = JSON.stringify(details, null, 4);
 
-        this.message =
-            `${code ? `E${code}` : ''}: ${description}
-            Details:
-            ${formattedDetails ?? ''}`;
+        this.code = code;
+        this.message = `${code ? `E${code}` : ''}: ${description}. Details: ${formattedDetails ?? ''}`;
     }
 }
 
@@ -84,9 +82,9 @@ export namespace ERRORS {
     };
 
     export const PG = {
-        UNABLE_TO_: {
+        UNABLE_TO_INSERT_RECORD: {
             code: 200,
-            description: 'Unable to'
+            description: 'Unable to insert new record.'
         },
 
         NOT_FOUND_BY_ID: {

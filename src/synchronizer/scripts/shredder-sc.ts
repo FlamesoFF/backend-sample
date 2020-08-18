@@ -1,23 +1,22 @@
-import axios from 'axios';
+import got from 'got';
 import elasticsearch from 'elasticsearch';
 import mysql from 'mysql';
 import util from 'util';
 import { getConfig } from './utils/helper';
 
 const
-    // axios = require('axios'),
     // elasticsearch = require('elasticsearch'),
     // util = require('util'),
     config = getConfig(),
     todoApi = config.API.todo,
-    mysqlSetting = config.mysql.apollo,
+    mysqlSetting = config.mysql.main,
     // mysql = require('mysql'),
     mysqlDb = mysql.createPool({
         host: mysqlSetting.host,
         user: mysqlSetting.username,
         password: mysqlSetting.password,
         database: mysqlSetting.database,
-        port: mysqlSetting.port
+        port: mysqlSetting.ports
     }),
     esSetting = config.elasticsearch,
     client = new elasticsearch.Client({
@@ -28,7 +27,7 @@ const
 mysqlDb.query = util.promisify(mysqlDb.query);
 
 const createTask = async (payload) => {
-    return await axios.post(todoApi, payload);
+    return await got.post(todoApi, { json: payload });
 };
 
 const updateStatus = async (document) => {
@@ -55,7 +54,7 @@ const getTask = async (payload) => {
                 }
             },{
                 'match_phrase': {
-                    'content': payload.content
+                    'content': payload.description
                 }
             },{
                 'match_phrase': {
@@ -102,10 +101,10 @@ const processDocument = async (document, setting) => {
         }
     }
     if (document.completed) {
-        if (document.content === 'Shred file') {
+        if (document.description === 'Shred file') {
             await updateCompanyShredStatus(document);
         }
-        if (['File to FC', 'Shred file'].includes(document.content) || (document.comments || []).some(c => c.body.trim().toLowerCase().includes('not found'))) {
+        if (['File to FC', 'Shred file'].includes(document.description) || (document.comments || []).some(c => c.body.trim().toLowerCase().includes('not found'))) {
             await updateStatus(document);
         }
     }

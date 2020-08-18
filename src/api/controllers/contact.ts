@@ -6,12 +6,12 @@ import { ApolloDocument, RelationDefinedMeta } from '../../@types/types';
 import nano from 'nano';
 import { PostgreSqlService } from '../../services/postgreSql';
 import { ApiError, ERRORS } from '../errors';
-import { ResponseFormatterData } from '../middlewares/response';
+import { ResponseFormatterData } from "../middlewares/types";
 
 
 export const contactsController = new class Controller {
 
-    async fetch(request: Requests.Contacts.IGetByEmail): Promise<IRelation | RelationDefinedMeta> {
+    async fetch( request: Requests.Contacts.IGetByEmail ): Promise<IRelation | RelationDefinedMeta> {
         const { email } = request.params;
 
         try {
@@ -42,14 +42,14 @@ export const contactsController = new class Controller {
 
             const mongoResponse = await CouchDbService.adapter.find(query);
 
-            const mapFunction = (doc: ApolloDocument): RelationDefinedMeta => {
+            const mapFunction = ( doc: ApolloDocument ): RelationDefinedMeta => {
                 const {
                     name,
                     email: relationEmail,
                     initials,
                     node
                 } = doc.relations.find(
-                    (item: IRelation<INode>) =>
+                    ( item: IRelation<INode> ) =>
                         item.type === 'has_contact' && item.email === email
                 );
 
@@ -60,10 +60,9 @@ export const contactsController = new class Controller {
 
                 let docName: string = '';
 
-                if (isTask(doc)) {
-                    docName = doc.content;
-                }
-                else if (isDocumentWithName(doc)) {
+                if ( isTask(doc) ) {
+                    docName = doc.description;
+                } else if ( isDocumentWithName(doc) ) {
                     docName = doc.name;
                 }
 
@@ -84,14 +83,14 @@ export const contactsController = new class Controller {
 
             const { docs } = mongoResponse;
 
-            if (docs && docs.length > 0) {
+            if ( docs && docs.length > 0 ) {
                 const [result] = docs.map(mapFunction);
 
                 return result;
             }
 
             throw { statusCode: 404 };
-        } catch (error) {
+        } catch ( error ) {
             throw error;
         }
     }
@@ -100,30 +99,30 @@ export const contactsController = new class Controller {
 
 export class ContactsPgSQLController {
 
-    static async create({
+    static async create( {
         params: { id },
         body: {
             contact_id,
             message_id,
             data = '{}'
         }
-    }: Requests.Contacts.ICreatePgSQL): Promise<ResponseFormatterData | void> {
-        const quit = (parameterName) => {
+    }: Requests.Contacts.ICreatePgSQL ): Promise<ResponseFormatterData | void> {
+        const quit = ( parameterName ) => {
             throw new ApiError(ERRORS.COMMON.MISSING_REQUIRED_PARAMETERS, [parameterName]);
         };
 
-        if (!contact_id) quit('contact_id');
-        if (!id) quit('entity_id');
+        if ( !contact_id ) quit('contact_id');
+        if ( !id ) quit('entity_id');
 
         let queryParams = '';
 
-        if (contact_id) queryParams += `p_contact_id:='${contact_id}'`;
-        if (message_id) queryParams += `,p_message_id:='${message_id}'`;
-        if (id) queryParams += `,p_entity_id:='${id}'`;
+        if ( contact_id ) queryParams += `p_contact_id:='${ contact_id }'`;
+        if ( message_id ) queryParams += `,p_message_id:='${ message_id }'`;
+        if ( id ) queryParams += `,p_entity_id:='${ id }'`;
 
-        queryParams += `,p_data:='${JSON.stringify(data)}'`;
+        queryParams += `,p_data:='${ JSON.stringify(data) }'`;
 
-        const query = `CALL add_contact(${queryParams})`;
+        const query = `CALL add_contact(${ queryParams })`;
 
         const errorMessage = 'Unable to create contact. PgSQL internal error.';
 
@@ -131,28 +130,28 @@ export class ContactsPgSQLController {
             const result = await PostgreSqlService.adapter.query(query);
 
             console.log(result);
-        } catch (e) {
-            throw `${errorMessage} ${e}`;
+        } catch ( e ) {
+            throw new ApiError(ERRORS.PG.UNABLE_TO_INSERT_RECORD);
         }
     }
 
 
-    static async get({
+    static async get( {
         params: { id },
         query: { entity_id }
-    }: Requests.Contacts.IGetPgSQL): Promise<any> {
+    }: Requests.Contacts.IGetPgSQL ): Promise<any> {
         let queryParams = '';
 
-        if (id) queryParams += `p_contact_id:='${id}'`;
-        if (entity_id) queryParams += `,p_entity_id:='${entity_id}'`;
+        if ( id ) queryParams += `p_contact_id:='${ id }'`;
+        if ( entity_id ) queryParams += `,p_entity_id:='${ entity_id }'`;
 
-        const query = `SELECT * FROM get_contacts(${queryParams})`;
+        const query = `SELECT * FROM get_contacts(${ queryParams })`;
 
         try {
-            const { rows } = await PostgreSqlService.adapter.query(query);
+            const { rows = [] } = await PostgreSqlService.adapter.query(query);
 
             return rows;
-        } catch (e) {
+        } catch ( e ) {
             throw 'Unable to get contact. PgSQL internal error:' + e;
         }
     }
